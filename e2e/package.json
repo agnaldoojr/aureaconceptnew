@@ -1,0 +1,12 @@
+{
+  "name": "aureaconceptnew-e2e",
+  "private": true,
+  "description": "Ferramentas de desenvolvimento/teste (Playwright). NÃO entram na imagem de produção.",
+  "type": "module",
+  "scripts": {
+    "capturar": "node capturar-referencia.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.1"
+  }
+}

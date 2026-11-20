@@ -1,0 +1,1757 @@
+{
+  "base": "http://localhost:8091",
+  "geradoEm": "2026-11-20T16:56:15.438Z",
+  "casos": [
+    {
+      "nome": "login sem corpo útil",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {},
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Informe o login e a senha."
+        },
+        "corpo_bruto": "{\"erro\":\"Informe o login e a senha.\"}"
+      }
+    },
+    {
+      "nome": "login só com login",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "vendedor1"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Informe o login e a senha."
+        },
+        "corpo_bruto": "{\"erro\":\"Informe o login e a senha.\"}"
+      }
+    },
+    {
+      "nome": "login com senha errada",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "vendedor1",
+          "senha": "errada"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 401,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Login ou senha inválidos."
+        },
+        "corpo_bruto": "{\"erro\":\"Login ou senha inválidos.\"}"
+      }
+    },
+    {
+      "nome": "login de usuário sem APP_VENDAS (recepcao1)",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "recepcao1",
+          "senha": "Teste@123"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 403,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Este usuário não tem acesso ao aplicativo de vendas. Peça ao administrador para liberar."
+        },
+        "corpo_bruto": "{\"erro\":\"Este usuário não tem acesso ao aplicativo de vendas. Peça ao administrador para liberar.\"}"
+      }
+    },
+    {
+      "nome": "JSON inválido no login",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": "{nao e json",
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Dados inválidos na requisição."
+        },
+        "corpo_bruto": "{\"erro\":\"Dados inválidos na requisição.\"}"
+      }
+    },
+    {
+      "nome": "login correto",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "vendedor1",
+          "senha": "Teste@123",
+          "dispositivo": "contrato.mjs"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": {
+          "token": "doHYBHGNNu-AHA5PFZa8RvPy94BJNnFeV0ntplexZxM",
+          "expiraEm": "<DATAHORA>",
+          "usuario": {
+            "codigo": 2,
+            "nome": "Vendedor Loja",
+            "login": "vendedor1",
+            "vendedor": {
+              "codigo": 7,
+              "nome": "Carlos Eduardo Vendedor"
+            },
+            "podeLancar": true
+          }
+        },
+        "corpo_bruto": "{\"token\":\"doHYBHGNNu-AHA5PFZa8RvPy94BJNnFeV0ntplexZxM\",\"expiraEm\":\"<DATAHORA>\",\"usuario\":{\"codigo\":2,\"nome\":\"Vendedor Loja\",\"login\":\"vendedor1\",\"vendedor\":{\"codigo\":7,\"nome\":\"Carlos Eduardo Vendedor\"},\"podeLancar\":true}}"
+      }
+    },
+    {
+      "nome": "rota protegida sem token",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/me",
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 401,
+        "content_type": "application/json;charset=UTF-8",
+        "corpo": {
+          "erro": "Sessão expirada ou inválida. Faça login novamente."
+        },
+        "corpo_bruto": "{\"erro\":\"Sessão expirada ou inválida. Faça login novamente.\"}"
+      }
+    },
+    {
+      "nome": "rota protegida com token inválido",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/me",
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 401,
+        "content_type": "application/json;charset=UTF-8",
+        "corpo": {
+          "erro": "Sessão expirada ou inválida. Faça login novamente."
+        },
+        "corpo_bruto": "{\"erro\":\"Sessão expirada ou inválida. Faça login novamente.\"}"
+      }
+    },
+    {
+      "nome": "me",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/me",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": {
+          "codigo": 2,
+          "nome": "Vendedor Loja",
+          "login": "vendedor1",
+          "vendedor": {
+            "codigo": 7,
+            "nome": "Carlos Eduardo Vendedor"
+          },
+          "podeLancar": true
+        },
+        "corpo_bruto": "{\"codigo\":2,\"nome\":\"Vendedor Loja\",\"login\":\"vendedor1\",\"vendedor\":{\"codigo\":7,\"nome\":\"Carlos Eduardo Vendedor\"},\"podeLancar\":true}"
+      }
+    },
+    {
+      "nome": "clientes (todos)",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/clientes",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 2,
+            "nome": "Ana Paula Ferreira",
+            "documento": "234.567.890-11",
+            "telefone": "(11) 97654-3210",
+            "nascimento": null,
+            "segmentos": []
+          },
+          {
+            "codigo": 11,
+            "nome": "Cliente Aniversariante Hoje",
+            "documento": "333.444.555-14",
+            "telefone": "(17) 99222-0001",
+            "nascimento": "1996-11-20",
+            "segmentos": [
+              {
+                "codigo": 1,
+                "nome": "Loja de roupa"
+              }
+            ]
+          },
+          {
+            "codigo": 12,
+            "nome": "Cliente Aniversario Em Tres Dias",
+            "documento": "444.555.666-23",
+            "telefone": "(17) 99222-0002",
+            "nascimento": "1985-11-23",
+            "segmentos": [
+              {
+                "codigo": 2,
+                "nome": "Salão"
+              }
+            ]
+          },
+          {
+            "codigo": 3,
+            "nome": "Juliana Santos Lima",
+            "documento": "345.678.901-22",
+            "telefone": "(21) 96543-2109",
+            "nascimento": null,
+            "segmentos": []
+          },
+          {
+            "codigo": 1,
+            "nome": "Maria Clara Oliveira",
+            "documento": "123.456.789-00",
+            "telefone": "(11) 98765-4321",
+            "nascimento": null,
+            "segmentos": []
+          },
+          {
+            "codigo": 13,
+            "nome": "Marta Cliente Salao",
+            "documento": "555.666.777-32",
+            "telefone": "(17) 99222-0003",
+            "nascimento": null,
+            "segmentos": [
+              {
+                "codigo": 1,
+                "nome": "Loja de roupa"
+              },
+              {
+                "codigo": 2,
+                "nome": "Salão"
+              }
+            ]
+          },
+          {
+            "codigo": 4,
+            "nome": "Rafaela Costa Mendes",
+            "documento": "456.789.012-33",
+            "telefone": "(31) 95432-1098",
+            "nascimento": null,
+            "segmentos": []
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":2,\"nome\":\"Ana Paula Ferreira\",\"documento\":\"234.567.890-11\",\"telefone\":\"(11) 97654-3210\",\"nascimento\":null,\"segmentos\":[]},{\"codigo\":11,\"nome\":\"Cliente Aniversariante Hoje\",\"documento\":\"333.444.555-14\",\"telefone\":\"(17) 99222-0001\",\"nascimento\":\"1996-11-20\",\"segmentos\":[{\"codigo\":1,\"nome\":\"Loja de roupa\"}]},{\"codigo\":12,\"nome\":\"Cliente Aniversario Em Tres Dias\",\"documento\":\"444.555.666-23\",\"telefone\":\"(17) 99222-0002\",\"nascimento\":\"1985-11-23\",\"segmentos\":[{\"codigo\":2,\"nome\":\"Salão\"}]},{\"codigo\":3,\"nome\":\"Juliana Santos Lima\",\"documento\":\"345.678.901-22\",\"telefone\":\"(21) 96543-2109\",\"nascimento\":null,\"segmentos\":[]},{\"codigo\":1,\"nome\":\"Maria Clara Oliveira\",\"documento\":\"123.456.789-00\",\"telefone\":\"(11) 98765-4321\",\"nascimento\":null,\"segmentos\":[]},{\"codigo\":13,\"nome\":\"Marta Cliente Salao\",\"documento\":\"555.666.777-32\",\"telefone\":\"(17) 99222-0003\",\"nascimento\":null,\"segmentos\":[{\"codigo\":1,\"nome\":\"Loja de roupa\"},{\"codigo\":2,\"nome\":\"Salão\"}]},{\"codigo\":4,\"nome\":\"Rafaela Costa Mendes\",\"documento\":\"456.789.012-33\",\"telefone\":\"(31) 95432-1098\",\"nascimento\":null,\"segmentos\":[]}]"
+      }
+    },
+    {
+      "nome": "clientes busca \"maria\"",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/clientes?busca=maria",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 1,
+            "nome": "Maria Clara Oliveira",
+            "documento": "123.456.789-00",
+            "telefone": "(11) 98765-4321",
+            "nascimento": null,
+            "segmentos": []
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":1,\"nome\":\"Maria Clara Oliveira\",\"documento\":\"123.456.789-00\",\"telefone\":\"(11) 98765-4321\",\"nascimento\":null,\"segmentos\":[]}]"
+      }
+    },
+    {
+      "nome": "clientes busca sem acento \"aniversario\"",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/clientes?busca=aniversario",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 12,
+            "nome": "Cliente Aniversario Em Tres Dias",
+            "documento": "444.555.666-23",
+            "telefone": "(17) 99222-0002",
+            "nascimento": "1985-11-23",
+            "segmentos": [
+              {
+                "codigo": 2,
+                "nome": "Salão"
+              }
+            ]
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":12,\"nome\":\"Cliente Aniversario Em Tres Dias\",\"documento\":\"444.555.666-23\",\"telefone\":\"(17) 99222-0002\",\"nascimento\":\"1985-11-23\",\"segmentos\":[{\"codigo\":2,\"nome\":\"Salão\"}]}]"
+      }
+    },
+    {
+      "nome": "clientes limite 2",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/clientes?limite=2",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 2,
+            "nome": "Ana Paula Ferreira",
+            "documento": "234.567.890-11",
+            "telefone": "(11) 97654-3210",
+            "nascimento": null,
+            "segmentos": []
+          },
+          {
+            "codigo": 11,
+            "nome": "Cliente Aniversariante Hoje",
+            "documento": "333.444.555-14",
+            "telefone": "(17) 99222-0001",
+            "nascimento": "1996-11-20",
+            "segmentos": [
+              {
+                "codigo": 1,
+                "nome": "Loja de roupa"
+              }
+            ]
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":2,\"nome\":\"Ana Paula Ferreira\",\"documento\":\"234.567.890-11\",\"telefone\":\"(11) 97654-3210\",\"nascimento\":null,\"segmentos\":[]},{\"codigo\":11,\"nome\":\"Cliente Aniversariante Hoje\",\"documento\":\"333.444.555-14\",\"telefone\":\"(17) 99222-0001\",\"nascimento\":\"1996-11-20\",\"segmentos\":[{\"codigo\":1,\"nome\":\"Loja de roupa\"}]}]"
+      }
+    },
+    {
+      "nome": "clientes busca por CPF (só dígitos)",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/clientes?busca=55566677732",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [],
+        "corpo_bruto": "[]"
+      }
+    },
+    {
+      "nome": "segmentos",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/segmentos",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 1,
+            "nome": "Loja de roupa"
+          },
+          {
+            "codigo": 2,
+            "nome": "Salão"
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":1,\"nome\":\"Loja de roupa\"},{\"codigo\":2,\"nome\":\"Salão\"}]"
+      }
+    },
+    {
+      "nome": "produtos (todos)",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/produtos",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 4,
+            "nome": "Anel Solitário Zircônia",
+            "complemento": "Aro dourado com zircônia central",
+            "unidade": "UN",
+            "preco": 79.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 9,
+            "nome": "Blusa Seda",
+            "complemento": "Tamanho M",
+            "unidade": "UN",
+            "preco": 120,
+            "estoque": 7,
+            "unidades": []
+          },
+          {
+            "codigo": 8,
+            "nome": "Bracelete Rígido Liso",
+            "complemento": "Banhado a ouro amarelo 18k",
+            "unidade": "UN",
+            "preco": 99.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 2,
+            "nome": "Brinco Argola Pequena",
+            "complemento": "Banhado a ouro, diâmetro 2cm",
+            "unidade": "UN",
+            "preco": 49.9,
+            "estoque": 10,
+            "unidades": []
+          },
+          {
+            "codigo": 11,
+            "nome": "Brinco Pérola",
+            "complemento": "Banhado a ouro",
+            "unidade": "UN",
+            "preco": 25,
+            "estoque": 48,
+            "unidades": [
+              {
+                "sigla": "CX",
+                "fator": 12,
+                "preco": 270
+              }
+            ]
+          },
+          {
+            "codigo": 10,
+            "nome": "Calça Jeans Flare",
+            "complemento": "Tamanho 38",
+            "unidade": "UN",
+            "preco": 180,
+            "estoque": 6,
+            "unidades": []
+          },
+          {
+            "codigo": 1,
+            "nome": "Colar Dourado Delicado",
+            "complemento": "Banhado a ouro 18k, corrente fina 45cm",
+            "unidade": "UN",
+            "preco": 89.9,
+            "estoque": 10,
+            "unidades": []
+          },
+          {
+            "codigo": 6,
+            "nome": "Conjunto Luxo Pérola",
+            "complemento": "Colar + brinco com pérola sintética",
+            "unidade": "CJ",
+            "preco": 199.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 7,
+            "nome": "Pingente Coração Cravejado",
+            "complemento": "Zircônias brancas cravejadas",
+            "unidade": "UN",
+            "preco": 69.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 3,
+            "nome": "Pulseira Riviera Cristal",
+            "complemento": "Pedras de cristal transparente",
+            "unidade": "UN",
+            "preco": 129.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 5,
+            "nome": "Tornozeleira Estrela Dourada",
+            "complemento": "Banhado a ouro, com pingente estrela",
+            "unidade": "UN",
+            "preco": 59.9,
+            "estoque": 0,
+            "unidades": []
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":4,\"nome\":\"Anel Solitário Zircônia\",\"complemento\":\"Aro dourado com zircônia central\",\"unidade\":\"UN\",\"preco\":79.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":9,\"nome\":\"Blusa Seda\",\"complemento\":\"Tamanho M\",\"unidade\":\"UN\",\"preco\":120.00,\"estoque\":7.000,\"unidades\":[]},{\"codigo\":8,\"nome\":\"Bracelete Rígido Liso\",\"complemento\":\"Banhado a ouro amarelo 18k\",\"unidade\":\"UN\",\"preco\":99.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":2,\"nome\":\"Brinco Argola Pequena\",\"complemento\":\"Banhado a ouro, diâmetro 2cm\",\"unidade\":\"UN\",\"preco\":49.90,\"estoque\":10.000,\"unidades\":[]},{\"codigo\":11,\"nome\":\"Brinco Pérola\",\"complemento\":\"Banhado a ouro\",\"unidade\":\"UN\",\"preco\":25.00,\"estoque\":48.000,\"unidades\":[{\"sigla\":\"CX\",\"fator\":12.000000,\"preco\":270.00}]},{\"codigo\":10,\"nome\":\"Calça Jeans Flare\",\"complemento\":\"Tamanho 38\",\"unidade\":\"UN\",\"preco\":180.00,\"estoque\":6.000,\"unidades\":[]},{\"codigo\":1,\"nome\":\"Colar Dourado Delicado\",\"complemento\":\"Banhado a ouro 18k, corrente fina 45cm\",\"unidade\":\"UN\",\"preco\":89.90,\"estoque\":10.000,\"unidades\":[]},{\"codigo\":6,\"nome\":\"Conjunto Luxo Pérola\",\"complemento\":\"Colar + brinco com pérola sintética\",\"unidade\":\"CJ\",\"preco\":199.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":7,\"nome\":\"Pingente Coração Cravejado\",\"complemento\":\"Zircônias brancas cravejadas\",\"unidade\":\"UN\",\"preco\":69.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":3,\"nome\":\"Pulseira Riviera Cristal\",\"complemento\":\"Pedras de cristal transparente\",\"unidade\":\"UN\",\"preco\":129.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":5,\"nome\":\"Tornozeleira Estrela Dourada\",\"complemento\":\"Banhado a ouro, com pingente estrela\",\"unidade\":\"UN\",\"preco\":59.90,\"estoque\":0.000,\"unidades\":[]}]"
+      }
+    },
+    {
+      "nome": "produtos com estoque",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/produtos?estoque=com",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 9,
+            "nome": "Blusa Seda",
+            "complemento": "Tamanho M",
+            "unidade": "UN",
+            "preco": 120,
+            "estoque": 7,
+            "unidades": []
+          },
+          {
+            "codigo": 2,
+            "nome": "Brinco Argola Pequena",
+            "complemento": "Banhado a ouro, diâmetro 2cm",
+            "unidade": "UN",
+            "preco": 49.9,
+            "estoque": 10,
+            "unidades": []
+          },
+          {
+            "codigo": 11,
+            "nome": "Brinco Pérola",
+            "complemento": "Banhado a ouro",
+            "unidade": "UN",
+            "preco": 25,
+            "estoque": 48,
+            "unidades": [
+              {
+                "sigla": "CX",
+                "fator": 12,
+                "preco": 270
+              }
+            ]
+          },
+          {
+            "codigo": 10,
+            "nome": "Calça Jeans Flare",
+            "complemento": "Tamanho 38",
+            "unidade": "UN",
+            "preco": 180,
+            "estoque": 6,
+            "unidades": []
+          },
+          {
+            "codigo": 1,
+            "nome": "Colar Dourado Delicado",
+            "complemento": "Banhado a ouro 18k, corrente fina 45cm",
+            "unidade": "UN",
+            "preco": 89.9,
+            "estoque": 10,
+            "unidades": []
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":9,\"nome\":\"Blusa Seda\",\"complemento\":\"Tamanho M\",\"unidade\":\"UN\",\"preco\":120.00,\"estoque\":7.000,\"unidades\":[]},{\"codigo\":2,\"nome\":\"Brinco Argola Pequena\",\"complemento\":\"Banhado a ouro, diâmetro 2cm\",\"unidade\":\"UN\",\"preco\":49.90,\"estoque\":10.000,\"unidades\":[]},{\"codigo\":11,\"nome\":\"Brinco Pérola\",\"complemento\":\"Banhado a ouro\",\"unidade\":\"UN\",\"preco\":25.00,\"estoque\":48.000,\"unidades\":[{\"sigla\":\"CX\",\"fator\":12.000000,\"preco\":270.00}]},{\"codigo\":10,\"nome\":\"Calça Jeans Flare\",\"complemento\":\"Tamanho 38\",\"unidade\":\"UN\",\"preco\":180.00,\"estoque\":6.000,\"unidades\":[]},{\"codigo\":1,\"nome\":\"Colar Dourado Delicado\",\"complemento\":\"Banhado a ouro 18k, corrente fina 45cm\",\"unidade\":\"UN\",\"preco\":89.90,\"estoque\":10.000,\"unidades\":[]}]"
+      }
+    },
+    {
+      "nome": "produtos sem estoque",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/produtos?estoque=sem",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 4,
+            "nome": "Anel Solitário Zircônia",
+            "complemento": "Aro dourado com zircônia central",
+            "unidade": "UN",
+            "preco": 79.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 8,
+            "nome": "Bracelete Rígido Liso",
+            "complemento": "Banhado a ouro amarelo 18k",
+            "unidade": "UN",
+            "preco": 99.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 6,
+            "nome": "Conjunto Luxo Pérola",
+            "complemento": "Colar + brinco com pérola sintética",
+            "unidade": "CJ",
+            "preco": 199.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 7,
+            "nome": "Pingente Coração Cravejado",
+            "complemento": "Zircônias brancas cravejadas",
+            "unidade": "UN",
+            "preco": 69.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 3,
+            "nome": "Pulseira Riviera Cristal",
+            "complemento": "Pedras de cristal transparente",
+            "unidade": "UN",
+            "preco": 129.9,
+            "estoque": 0,
+            "unidades": []
+          },
+          {
+            "codigo": 5,
+            "nome": "Tornozeleira Estrela Dourada",
+            "complemento": "Banhado a ouro, com pingente estrela",
+            "unidade": "UN",
+            "preco": 59.9,
+            "estoque": 0,
+            "unidades": []
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":4,\"nome\":\"Anel Solitário Zircônia\",\"complemento\":\"Aro dourado com zircônia central\",\"unidade\":\"UN\",\"preco\":79.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":8,\"nome\":\"Bracelete Rígido Liso\",\"complemento\":\"Banhado a ouro amarelo 18k\",\"unidade\":\"UN\",\"preco\":99.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":6,\"nome\":\"Conjunto Luxo Pérola\",\"complemento\":\"Colar + brinco com pérola sintética\",\"unidade\":\"CJ\",\"preco\":199.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":7,\"nome\":\"Pingente Coração Cravejado\",\"complemento\":\"Zircônias brancas cravejadas\",\"unidade\":\"UN\",\"preco\":69.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":3,\"nome\":\"Pulseira Riviera Cristal\",\"complemento\":\"Pedras de cristal transparente\",\"unidade\":\"UN\",\"preco\":129.90,\"estoque\":0.000,\"unidades\":[]},{\"codigo\":5,\"nome\":\"Tornozeleira Estrela Dourada\",\"complemento\":\"Banhado a ouro, com pingente estrela\",\"unidade\":\"UN\",\"preco\":59.90,\"estoque\":0.000,\"unidades\":[]}]"
+      }
+    },
+    {
+      "nome": "produtos busca sem acento \"calca\"",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/produtos?busca=calca",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 10,
+            "nome": "Calça Jeans Flare",
+            "complemento": "Tamanho 38",
+            "unidade": "UN",
+            "preco": 180,
+            "estoque": 6,
+            "unidades": []
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":10,\"nome\":\"Calça Jeans Flare\",\"complemento\":\"Tamanho 38\",\"unidade\":\"UN\",\"preco\":180.00,\"estoque\":6.000,\"unidades\":[]}]"
+      }
+    },
+    {
+      "nome": "produtos limite 1",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/produtos?limite=1",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 4,
+            "nome": "Anel Solitário Zircônia",
+            "complemento": "Aro dourado com zircônia central",
+            "unidade": "UN",
+            "preco": 79.9,
+            "estoque": 0,
+            "unidades": []
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":4,\"nome\":\"Anel Solitário Zircônia\",\"complemento\":\"Aro dourado com zircônia central\",\"unidade\":\"UN\",\"preco\":79.90,\"estoque\":0.000,\"unidades\":[]}]"
+      }
+    },
+    {
+      "nome": "formas de pagamento",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/formas-pagamento",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 5,
+            "nome": "Boleto",
+            "descricao": "Vence em 30 dias · até 6x",
+            "parcelavel": true,
+            "maxParcelas": 6,
+            "aVista": false
+          },
+          {
+            "codigo": 4,
+            "nome": "Cartão de crédito",
+            "descricao": "Vence em 30 dias · até 12x",
+            "parcelavel": true,
+            "maxParcelas": 12,
+            "aVista": false
+          },
+          {
+            "codigo": 3,
+            "nome": "Cartão de débito",
+            "descricao": "Vence em 1 dias",
+            "parcelavel": false,
+            "maxParcelas": 1,
+            "aVista": false
+          },
+          {
+            "codigo": 6,
+            "nome": "Crediário",
+            "descricao": "Vence em 30 dias · até 6x",
+            "parcelavel": true,
+            "maxParcelas": 6,
+            "aVista": false
+          },
+          {
+            "codigo": 1,
+            "nome": "Dinheiro",
+            "descricao": "À vista",
+            "parcelavel": false,
+            "maxParcelas": 1,
+            "aVista": true
+          },
+          {
+            "codigo": 2,
+            "nome": "PIX",
+            "descricao": "À vista",
+            "parcelavel": false,
+            "maxParcelas": 1,
+            "aVista": true
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":5,\"nome\":\"Boleto\",\"descricao\":\"Vence em 30 dias · até 6x\",\"parcelavel\":true,\"maxParcelas\":6,\"aVista\":false},{\"codigo\":4,\"nome\":\"Cartão de crédito\",\"descricao\":\"Vence em 30 dias · até 12x\",\"parcelavel\":true,\"maxParcelas\":12,\"aVista\":false},{\"codigo\":3,\"nome\":\"Cartão de débito\",\"descricao\":\"Vence em 1 dias\",\"parcelavel\":false,\"maxParcelas\":1,\"aVista\":false},{\"codigo\":6,\"nome\":\"Crediário\",\"descricao\":\"Vence em 30 dias · até 6x\",\"parcelavel\":true,\"maxParcelas\":6,\"aVista\":false},{\"codigo\":1,\"nome\":\"Dinheiro\",\"descricao\":\"À vista\",\"parcelavel\":false,\"maxParcelas\":1,\"aVista\":true},{\"codigo\":2,\"nome\":\"PIX\",\"descricao\":\"À vista\",\"parcelavel\":false,\"maxParcelas\":1,\"aVista\":true}]"
+      }
+    },
+    {
+      "nome": "última venda de produto com venda",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/produtos/9/ultima-venda",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": {
+          "data": "<HOJE>",
+          "quantidade": 1,
+          "valor": 120,
+          "unidade": "UN"
+        },
+        "corpo_bruto": "{\"data\":\"<HOJE>\",\"quantidade\":1.000,\"valor\":120.00,\"unidade\":\"UN\"}"
+      }
+    },
+    {
+      "nome": "última venda de produto sem venda",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/produtos/999999/ultima-venda",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 404,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Sem vendas anteriores."
+        },
+        "corpo_bruto": "{\"erro\":\"Sem vendas anteriores.\"}"
+      }
+    },
+    {
+      "nome": "pedidos (lista)",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/pedidos",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 9,
+            "data": "<HOJE>",
+            "clienteId": 1,
+            "cliente": "Maria Clara Oliveira",
+            "vendedor": "Carlos Eduardo Vendedor",
+            "valor": 120,
+            "quantidadeItens": 1,
+            "formaPagamento": "PIX",
+            "parcelas": 1,
+            "itens": []
+          },
+          {
+            "codigo": 8,
+            "data": "<HOJE>",
+            "clienteId": 1,
+            "cliente": "Maria Clara Oliveira",
+            "vendedor": "Carlos Eduardo Vendedor",
+            "valor": 240,
+            "quantidadeItens": 1,
+            "formaPagamento": "Crediário",
+            "parcelas": 2,
+            "itens": []
+          },
+          {
+            "codigo": 6,
+            "data": "<HOJE>",
+            "clienteId": 11,
+            "cliente": "Cliente Aniversariante Hoje",
+            "vendedor": "Carlos Eduardo Vendedor",
+            "valor": 630,
+            "quantidadeItens": 2,
+            "formaPagamento": "Cartão de crédito",
+            "parcelas": 3,
+            "itens": []
+          },
+          {
+            "codigo": 5,
+            "data": "<HOJE>",
+            "clienteId": 1,
+            "cliente": "Maria Clara Oliveira",
+            "vendedor": "Carlos Eduardo Vendedor",
+            "valor": 120,
+            "quantidadeItens": 1,
+            "formaPagamento": "Dinheiro",
+            "parcelas": 1,
+            "itens": []
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":9,\"data\":\"<HOJE>\",\"clienteId\":1,\"cliente\":\"Maria Clara Oliveira\",\"vendedor\":\"Carlos Eduardo Vendedor\",\"valor\":120.00,\"quantidadeItens\":1,\"formaPagamento\":\"PIX\",\"parcelas\":1,\"itens\":[]},{\"codigo\":8,\"data\":\"<HOJE>\",\"clienteId\":1,\"cliente\":\"Maria Clara Oliveira\",\"vendedor\":\"Carlos Eduardo Vendedor\",\"valor\":240.00,\"quantidadeItens\":1,\"formaPagamento\":\"Crediário\",\"parcelas\":2,\"itens\":[]},{\"codigo\":6,\"data\":\"<HOJE>\",\"clienteId\":11,\"cliente\":\"Cliente Aniversariante Hoje\",\"vendedor\":\"Carlos Eduardo Vendedor\",\"valor\":630.00,\"quantidadeItens\":2,\"formaPagamento\":\"Cartão de crédito\",\"parcelas\":3,\"itens\":[]},{\"codigo\":5,\"data\":\"<HOJE>\",\"clienteId\":1,\"cliente\":\"Maria Clara Oliveira\",\"vendedor\":\"Carlos Eduardo Vendedor\",\"valor\":120.00,\"quantidadeItens\":1,\"formaPagamento\":\"Dinheiro\",\"parcelas\":1,\"itens\":[]}]"
+      }
+    },
+    {
+      "nome": "pedidos busca por código inexistente",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/pedidos?busca=999999",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [],
+        "corpo_bruto": "[]"
+      }
+    },
+    {
+      "nome": "cliente sem nome",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/clientes",
+        "corpo": {
+          "nome": "  "
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Informe o nome do cliente."
+        },
+        "corpo_bruto": "{\"erro\":\"Informe o nome do cliente.\"}"
+      }
+    },
+    {
+      "nome": "cliente com nascimento futuro",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/clientes",
+        "corpo": {
+          "nome": "Futura",
+          "nascimento": "2026-11-25"
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "A data de nascimento não pode ser futura."
+        },
+        "corpo_bruto": "{\"erro\":\"A data de nascimento não pode ser futura.\"}"
+      }
+    },
+    {
+      "nome": "cliente criado",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/clientes",
+        "corpo": {
+          "nome": "Cliente Pelo App",
+          "documento": "999.888.777-66",
+          "telefone": "(17) 99444-0001",
+          "nascimento": "1990-05-10",
+          "segmentos": [
+            1
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 201,
+        "content_type": "application/json",
+        "corpo": {
+          "cliente": {
+            "codigo": 14,
+            "nome": "Cliente Pelo App",
+            "documento": "999.888.777-66",
+            "telefone": "(17) 99444-0001",
+            "nascimento": "1990-05-10",
+            "segmentos": [
+              {
+                "codigo": 1,
+                "nome": "Loja de roupa"
+              }
+            ]
+          },
+          "aviso": null
+        },
+        "corpo_bruto": "{\"cliente\":{\"codigo\":14,\"nome\":\"Cliente Pelo App\",\"documento\":\"999.888.777-66\",\"telefone\":\"(17) 99444-0001\",\"nascimento\":\"1990-05-10\",\"segmentos\":[{\"codigo\":1,\"nome\":\"Loja de roupa\"}]},\"aviso\":null}"
+      }
+    },
+    {
+      "nome": "cliente com CPF duplicado (409)",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/clientes",
+        "corpo": {
+          "nome": "Outro Nome",
+          "documento": "999.888.777-66"
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 409,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Já existe uma pessoa cadastrada com este CPF/CNPJ."
+        },
+        "corpo_bruto": "{\"erro\":\"Já existe uma pessoa cadastrada com este CPF/CNPJ.\"}"
+      }
+    },
+    {
+      "nome": "cliente com telefone repetido (aviso)",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/clientes",
+        "corpo": {
+          "nome": "Telefone Igual",
+          "telefone": "(17) 99444-0001"
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 201,
+        "content_type": "application/json",
+        "corpo": {
+          "cliente": {
+            "codigo": 15,
+            "nome": "Telefone Igual",
+            "documento": null,
+            "telefone": "(17) 99444-0001",
+            "nascimento": null,
+            "segmentos": []
+          },
+          "aviso": "Atenção: já existe outra pessoa com este telefone."
+        },
+        "corpo_bruto": "{\"cliente\":{\"codigo\":15,\"nome\":\"Telefone Igual\",\"documento\":null,\"telefone\":\"(17) 99444-0001\",\"nascimento\":null,\"segmentos\":[]},\"aviso\":\"Atenção: já existe outra pessoa com este telefone.\"}"
+      }
+    },
+    {
+      "nome": "pedido sem itens",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "formaPagamentoId": 2,
+          "itens": []
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Adicione pelo menos um item ao pedido."
+        },
+        "corpo_bruto": "{\"erro\":\"Adicione pelo menos um item ao pedido.\"}"
+      }
+    },
+    {
+      "nome": "pedido sem cliente",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Escolha o cliente."
+        },
+        "corpo_bruto": "{\"erro\":\"Escolha o cliente.\"}"
+      }
+    },
+    {
+      "nome": "pedido sem forma",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Escolha a forma de pagamento."
+        },
+        "corpo_bruto": "{\"erro\":\"Escolha a forma de pagamento.\"}"
+      }
+    },
+    {
+      "nome": "pedido com cliente inexistente",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 999999,
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Cliente não encontrado."
+        },
+        "corpo_bruto": "{\"erro\":\"Cliente não encontrado.\"}"
+      }
+    },
+    {
+      "nome": "pedido com data futura",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "data": "2026-11-22",
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "A data do pedido não pode ser futura."
+        },
+        "corpo_bruto": "{\"erro\":\"A data do pedido não pode ser futura.\"}"
+      }
+    },
+    {
+      "nome": "pedido com data de mais de 30 dias",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "data": "2026-10-20",
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "A data do pedido não pode ser anterior a 30 dias."
+        },
+        "corpo_bruto": "{\"erro\":\"A data do pedido não pode ser anterior a 30 dias.\"}"
+      }
+    },
+    {
+      "nome": "pedido com produto inexistente",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 999999,
+              "quantidade": 1
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Produto 999999 não encontrado."
+        },
+        "corpo_bruto": "{\"erro\":\"Produto 999999 não encontrado.\"}"
+      }
+    },
+    {
+      "nome": "pedido com quantidade zero",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 0
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Informe a quantidade de \"Blusa Seda\"."
+        },
+        "corpo_bruto": "{\"erro\":\"Informe a quantidade de \\\"Blusa Seda\\\".\"}"
+      }
+    },
+    {
+      "nome": "pedido com unidade inexistente",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1,
+              "unidade": "XX"
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "O produto 'Blusa Seda' não tem a unidade 'XX'. Cadastre-a em Produtos ou escolha outra."
+        },
+        "corpo_bruto": "{\"erro\":\"O produto 'Blusa Seda' não tem a unidade 'XX'. Cadastre-a em Produtos ou escolha outra.\"}"
+      }
+    },
+    {
+      "nome": "pedido com valor negativo",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1,
+              "valor": -5
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Informe o valor unitário de \"Blusa Seda\"."
+        },
+        "corpo_bruto": "{\"erro\":\"Informe o valor unitário de \\\"Blusa Seda\\\".\"}"
+      }
+    },
+    {
+      "nome": "pedido acima do estoque",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 9999
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Estoque insuficiente para 'Blusa Seda'. Disponível: 7.000 | Solicitado: 9999.000"
+        },
+        "corpo_bruto": "{\"erro\":\"Estoque insuficiente para 'Blusa Seda'. Disponível: 7.000 | Solicitado: 9999.000\"}"
+      }
+    },
+    {
+      "nome": "pedido com tipo errado no JSON",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": "abc",
+          "formaPagamentoId": 2,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Dados inválidos na requisição."
+        },
+        "corpo_bruto": "{\"erro\":\"Dados inválidos na requisição.\"}"
+      }
+    },
+    {
+      "nome": "pedido PIX (baixa automática)",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "formaPagamentoId": 2,
+          "parcelas": 1,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 201,
+        "content_type": "application/json",
+        "corpo": {
+          "codigo": 10,
+          "data": "<HOJE>",
+          "clienteId": 1,
+          "cliente": "Maria Clara Oliveira",
+          "vendedor": "Carlos Eduardo Vendedor",
+          "valor": 120,
+          "quantidadeItens": 1,
+          "formaPagamento": "PIX",
+          "parcelas": 1,
+          "itens": [
+            {
+              "produtoId": 9,
+              "produto": "Blusa Seda",
+              "unidade": "UN",
+              "quantidade": 1,
+              "valor": 120,
+              "total": 120
+            }
+          ]
+        },
+        "corpo_bruto": "{\"codigo\":10,\"data\":\"<HOJE>\",\"clienteId\":1,\"cliente\":\"Maria Clara Oliveira\",\"vendedor\":\"Carlos Eduardo Vendedor\",\"valor\":120.00,\"quantidadeItens\":1,\"formaPagamento\":\"PIX\",\"parcelas\":1,\"itens\":[{\"produtoId\":9,\"produto\":\"Blusa Seda\",\"unidade\":\"UN\",\"quantidade\":1,\"valor\":120.00,\"total\":120.00}]}"
+      }
+    },
+    {
+      "nome": "pedido crédito 3x com unidade CX e valor informado",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "formaPagamentoId": 4,
+          "parcelas": 3,
+          "itens": [
+            {
+              "produtoId": 11,
+              "quantidade": 1,
+              "unidade": "CX"
+            },
+            {
+              "produtoId": 10,
+              "quantidade": 1,
+              "valor": 170.5
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 201,
+        "content_type": "application/json",
+        "corpo": {
+          "codigo": 11,
+          "data": "<HOJE>",
+          "clienteId": 1,
+          "cliente": "Maria Clara Oliveira",
+          "vendedor": "Carlos Eduardo Vendedor",
+          "valor": 440.5,
+          "quantidadeItens": 2,
+          "formaPagamento": "Cartão de crédito",
+          "parcelas": 3,
+          "itens": [
+            {
+              "produtoId": 11,
+              "produto": "Brinco Pérola",
+              "unidade": "CX",
+              "quantidade": 1,
+              "valor": 270,
+              "total": 270
+            },
+            {
+              "produtoId": 10,
+              "produto": "Calça Jeans Flare",
+              "unidade": "UN",
+              "quantidade": 1,
+              "valor": 170.5,
+              "total": 170.5
+            }
+          ]
+        },
+        "corpo_bruto": "{\"codigo\":11,\"data\":\"<HOJE>\",\"clienteId\":1,\"cliente\":\"Maria Clara Oliveira\",\"vendedor\":\"Carlos Eduardo Vendedor\",\"valor\":440.50,\"quantidadeItens\":2,\"formaPagamento\":\"Cartão de crédito\",\"parcelas\":3,\"itens\":[{\"produtoId\":11,\"produto\":\"Brinco Pérola\",\"unidade\":\"CX\",\"quantidade\":1,\"valor\":270.00,\"total\":270.00},{\"produtoId\":10,\"produto\":\"Calça Jeans Flare\",\"unidade\":\"UN\",\"quantidade\":1,\"valor\":170.5,\"total\":170.5}]}"
+      }
+    },
+    {
+      "nome": "pedido crédito com parcelas acima do máximo",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/pedidos",
+        "corpo": {
+          "clienteId": 1,
+          "formaPagamentoId": 4,
+          "parcelas": 99,
+          "itens": [
+            {
+              "produtoId": 9,
+              "quantidade": 1
+            }
+          ]
+        },
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 400,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "A forma 'Cartão de crédito' permite de 1 a 12 parcelas."
+        },
+        "corpo_bruto": "{\"erro\":\"A forma 'Cartão de crédito' permite de 1 a 12 parcelas.\"}"
+      }
+    },
+    {
+      "nome": "detalhe do pedido",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/pedidos/10",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": {
+          "codigo": 10,
+          "data": "<HOJE>",
+          "clienteId": 1,
+          "cliente": "Maria Clara Oliveira",
+          "vendedor": "Carlos Eduardo Vendedor",
+          "valor": 120,
+          "quantidadeItens": 1,
+          "formaPagamento": "PIX",
+          "parcelas": 1,
+          "itens": [
+            {
+              "produtoId": 9,
+              "produto": "Blusa Seda",
+              "unidade": "UN",
+              "quantidade": 1,
+              "valor": 120,
+              "total": 120
+            }
+          ]
+        },
+        "corpo_bruto": "{\"codigo\":10,\"data\":\"<HOJE>\",\"clienteId\":1,\"cliente\":\"Maria Clara Oliveira\",\"vendedor\":\"Carlos Eduardo Vendedor\",\"valor\":120.00,\"quantidadeItens\":1,\"formaPagamento\":\"PIX\",\"parcelas\":1,\"itens\":[{\"produtoId\":9,\"produto\":\"Blusa Seda\",\"unidade\":\"UN\",\"quantidade\":1.000,\"valor\":120.00,\"total\":120.00}]}"
+      }
+    },
+    {
+      "nome": "detalhe do pedido parcelado",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/pedidos/11",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": {
+          "codigo": 11,
+          "data": "<HOJE>",
+          "clienteId": 1,
+          "cliente": "Maria Clara Oliveira",
+          "vendedor": "Carlos Eduardo Vendedor",
+          "valor": 440.5,
+          "quantidadeItens": 2,
+          "formaPagamento": "Cartão de crédito",
+          "parcelas": 3,
+          "itens": [
+            {
+              "produtoId": 11,
+              "produto": "Brinco Pérola",
+              "unidade": "CX",
+              "quantidade": 1,
+              "valor": 270,
+              "total": 270
+            },
+            {
+              "produtoId": 10,
+              "produto": "Calça Jeans Flare",
+              "unidade": "UN",
+              "quantidade": 1,
+              "valor": 170.5,
+              "total": 170.5
+            }
+          ]
+        },
+        "corpo_bruto": "{\"codigo\":11,\"data\":\"<HOJE>\",\"clienteId\":1,\"cliente\":\"Maria Clara Oliveira\",\"vendedor\":\"Carlos Eduardo Vendedor\",\"valor\":440.50,\"quantidadeItens\":2,\"formaPagamento\":\"Cartão de crédito\",\"parcelas\":3,\"itens\":[{\"produtoId\":11,\"produto\":\"Brinco Pérola\",\"unidade\":\"CX\",\"quantidade\":1.000,\"valor\":270.00,\"total\":270.00},{\"produtoId\":10,\"produto\":\"Calça Jeans Flare\",\"unidade\":\"UN\",\"quantidade\":1.000,\"valor\":170.50,\"total\":170.50}]}"
+      }
+    },
+    {
+      "nome": "detalhe de pedido inexistente",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/pedidos/999999",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 404,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Pedido não encontrado."
+        },
+        "corpo_bruto": "{\"erro\":\"Pedido não encontrado.\"}"
+      }
+    },
+    {
+      "nome": "produtos depois das vendas (estoque baixou)",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/produtos?busca=blusa",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": [
+          {
+            "codigo": 9,
+            "nome": "Blusa Seda",
+            "complemento": "Tamanho M",
+            "unidade": "UN",
+            "preco": 120,
+            "estoque": 6,
+            "unidades": []
+          }
+        ],
+        "corpo_bruto": "[{\"codigo\":9,\"nome\":\"Blusa Seda\",\"complemento\":\"Tamanho M\",\"unidade\":\"UN\",\"preco\":120.00,\"estoque\":6.000,\"unidades\":[]}]"
+      }
+    },
+    {
+      "nome": "tentativa errada 1 de \"bloqueio-teste\"",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "bloqueio-teste",
+          "senha": "x"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 401,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Login ou senha inválidos."
+        },
+        "corpo_bruto": "{\"erro\":\"Login ou senha inválidos.\"}"
+      }
+    },
+    {
+      "nome": "tentativa errada 2 de \"bloqueio-teste\"",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "bloqueio-teste",
+          "senha": "x"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 401,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Login ou senha inválidos."
+        },
+        "corpo_bruto": "{\"erro\":\"Login ou senha inválidos.\"}"
+      }
+    },
+    {
+      "nome": "tentativa errada 3 de \"bloqueio-teste\"",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "bloqueio-teste",
+          "senha": "x"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 401,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Login ou senha inválidos."
+        },
+        "corpo_bruto": "{\"erro\":\"Login ou senha inválidos.\"}"
+      }
+    },
+    {
+      "nome": "tentativa errada 4 de \"bloqueio-teste\"",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "bloqueio-teste",
+          "senha": "x"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 401,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Login ou senha inválidos."
+        },
+        "corpo_bruto": "{\"erro\":\"Login ou senha inválidos.\"}"
+      }
+    },
+    {
+      "nome": "tentativa errada 5 de \"bloqueio-teste\"",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "bloqueio-teste",
+          "senha": "x"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 401,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Login ou senha inválidos."
+        },
+        "corpo_bruto": "{\"erro\":\"Login ou senha inválidos.\"}"
+      }
+    },
+    {
+      "nome": "6ª tentativa: bloqueado (429)",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/login",
+        "corpo": {
+          "login": "bloqueio-teste",
+          "senha": "x"
+        },
+        "autenticada": false
+      },
+      "resposta": {
+        "status": 429,
+        "content_type": "application/json",
+        "corpo": {
+          "erro": "Muitas tentativas de login. Aguarde alguns minutos e tente novamente."
+        },
+        "corpo_bruto": "{\"erro\":\"Muitas tentativas de login. Aguarde alguns minutos e tente novamente.\"}"
+      }
+    },
+    {
+      "nome": "logout",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/api/logout",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": null,
+        "corpo": "",
+        "corpo_bruto": ""
+      }
+    },
+    {
+      "nome": "token revogado não vale mais",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/api/me",
+        "autenticada": true
+      },
+      "resposta": {
+        "status": 401,
+        "content_type": "application/json;charset=UTF-8",
+        "corpo": {
+          "erro": "Sessão expirada ou inválida. Faça login novamente."
+        },
+        "corpo_bruto": "{\"erro\":\"Sessão expirada ou inválida. Faça login novamente.\"}"
+      }
+    },
+    {
+      "nome": "vendedor/api/me com sessão",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/vendedor/api/me",
+        "sessao": true
+      },
+      "resposta": {
+        "status": 200,
+        "content_type": "application/json",
+        "corpo": {
+          "codigo": 2,
+          "nome": "Vendedor Loja",
+          "login": "vendedor1",
+          "vendedor": {
+            "codigo": 7,
+            "nome": "Carlos Eduardo Vendedor"
+          },
+          "podeLancar": true
+        }
+      }
+    },
+    {
+      "nome": "vendedor/api POST sem CSRF",
+      "requisicao": {
+        "metodo": "POST",
+        "caminho": "/vendedor/api/pedidos",
+        "sessao": true,
+        "csrf": false
+      },
+      "resposta": {
+        "status": 403,
+        "content_type": "application/json",
+        "corpo": "{\"timestamp\":\"2026-11-20T16:56:15.428+00:00\",\"status\":403,\"error\":\"Forbidden\",\"path\":\"/vendedor/api/pedidos\"}"
+      }
+    },
+    {
+      "nome": "vendedor/api/me sem sessão",
+      "requisicao": {
+        "metodo": "GET",
+        "caminho": "/vendedor/api/me",
+        "sessao": false
+      },
+      "resposta": {
+        "status": 302,
+        "location": "http://localhost:8091/login"
+      }
+    }
+  ]
+}

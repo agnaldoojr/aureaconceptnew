@@ -1,0 +1,253 @@
+# Catálogo de mensagens do sistema antigo (extraído do código, somente leitura)
+# formato: arquivo:linha: trecho
+
+## Mensagens de tela (flash sucesso/erro/info) nos controllers
+AgendaController.java:117:            ra.addFlashAttribute("erro", "Atendimento não encontrado.");
+AgendaController.java:154:            ra.addFlashAttribute("sucesso", agdCodigo == null ? "Atendimento agendado!" : "Atendimento atualizado!");
+AgendaController.java:155:            if (!r.avisos().isEmpty()) ra.addFlashAttribute("info", "Atenção: " + String.join(" ", r.avisos()));
+AgendaController.java:158:            ra.addFlashAttribute("erro", e.getMessage());
+AgendaController.java:169:            ra.addFlashAttribute("sucesso", "Atendimento: " + status.getRotulo() + ".");
+AgendaController.java:172:            ra.addFlashAttribute("erro", e.getMessage());
+AgendaController.java:184:            ra.addFlashAttribute("sucesso", "Atendimento excluído.");
+AgendaController.java:187:            ra.addFlashAttribute("erro", e.getMessage());
+AgendaController.java:198:            ra.addFlashAttribute("erro", "Atendimento não encontrado.");
+AgendaController.java:202:            ra.addFlashAttribute("erro", "Você não tem permissão para lançar vendas.");
+AgendaController.java:236:            ra.addFlashAttribute("sucesso", "Bloqueio criado!");
+AgendaController.java:238:            ra.addFlashAttribute("erro", e.getMessage());
+AgendaController.java:252:            ra.addFlashAttribute("sucesso", "Bloqueio removido.");
+AgendaController.java:254:            ra.addFlashAttribute("erro", e.getMessage());
+AgendaController.java:293:            ra.addFlashAttribute("sucesso", "Expediente salvo!");
+AgendaController.java:295:            ra.addFlashAttribute("erro", e.getMessage());
+BiController.java:48:            ra.addFlashAttribute("erro", "Você não tem permissão para acessar o BI.");
+CadastroFinanceiroController.java:56:            ra.addFlashAttribute("sucesso", "Forma de pagamento salva!");
+CadastroFinanceiroController.java:58:            ra.addFlashAttribute("erro", e.getMessage());
+CadastroFinanceiroController.java:68:        ra.addFlashAttribute("sucesso", "Status atualizado!");
+CadastroFinanceiroController.java:106:            ra.addFlashAttribute("sucesso", "Tipo de título salvo!");
+CadastroFinanceiroController.java:108:            ra.addFlashAttribute("erro", e.getMessage());
+CadastroFinanceiroController.java:118:        ra.addFlashAttribute("sucesso", "Status atualizado!");
+CadastroFinanceiroController.java:157:            ra.addFlashAttribute("sucesso", "Categoria salva!");
+CadastroFinanceiroController.java:159:            ra.addFlashAttribute("erro", e.getMessage());
+CadastroFinanceiroController.java:170:            ra.addFlashAttribute("sucesso", "Status atualizado!");
+CadastroFinanceiroController.java:172:            ra.addFlashAttribute("erro", e.getMessage());
+CadastroFinanceiroController.java:190:        ra.addFlashAttribute("erro", o + " não encontrado(a).");
+CadastroFinanceiroController.java:197:            ra.addFlashAttribute("sucesso", sucesso);
+CadastroFinanceiroController.java:199:            ra.addFlashAttribute("erro", e.getMessage());
+ContaFinanceiraController.java:59:            .orElseGet(() -> { ra.addFlashAttribute("erro", "Conta não encontrada."); return "redirect:/financeiro/contas"; });
+ContaFinanceiraController.java:74:            ra.addFlashAttribute("sucesso", "Conta salva!");
+ContaFinanceiraController.java:76:            ra.addFlashAttribute("erro", e.getMessage());
+ContaFinanceiraController.java:86:        ra.addFlashAttribute("sucesso", "Status da conta atualizado!");
+ContaFinanceiraController.java:94:            ra.addFlashAttribute("sucesso", "Conta excluída!");
+ContaFinanceiraController.java:96:            ra.addFlashAttribute("erro", e.getMessage());
+ContaFinanceiraController.java:121:            ra.addFlashAttribute("sucesso", "Transferência de R$ " + String.format(java.util.Locale.forLanguageTag("pt-BR"), "%,.2f", t.getTrfValor())
+ContaFinanceiraController.java:124:            ra.addFlashAttribute("erro", e.getMessage());
+ContaFinanceiraController.java:133:            ra.addFlashAttribute("sucesso", "Transferência estornada: os dois lançamentos foram removidos dos extratos.");
+ContaFinanceiraController.java:135:            ra.addFlashAttribute("erro", e.getMessage());
+ContaFinanceiraController.java:165:            ra.addFlashAttribute("erro", e.getMessage());
+ContaFinanceiraController.java:179:        ra.addFlashAttribute("sucesso", n == 0 ? "Nenhuma alteração na conciliação." : "Conciliação atualizada (" + n + (n == 1 ? " lançamento)." : " lançamentos)."));
+DocumentoController.java:135:                ra.addFlashAttribute("erro", "Atendimento não encontrado.");
+DocumentoController.java:234:                ra.addFlashAttribute("sucesso", "Documento lançado com sucesso!");
+DocumentoController.java:239:                        ra.addFlashAttribute("sucesso", "Venda #" + salvo.getDoctoCodigo() + " lançada e atendimento concluído!");
+DocumentoController.java:241:                        ra.addFlashAttribute("info", "Venda lançada, mas não consegui ligá-la ao atendimento: " + e.getMessage());
+DocumentoController.java:247:                ra.addFlashAttribute("sucesso", "Documento atualizado com sucesso!");
+DocumentoController.java:250:            ra.addFlashAttribute("erro", e.getMessage());
+DocumentoController.java:280:                ra.addFlashAttribute("erro", "Documento não encontrado.");
+DocumentoController.java:299:                    ra.addFlashAttribute("erro", "Documento não encontrado.");
+DocumentoController.java:310:            ra.addFlashAttribute("sucesso", "Documento excluído e estoque revertido!");
+DocumentoController.java:312:            ra.addFlashAttribute("erro", "Erro ao excluir: " + e.getMessage());
+FinanceiroController.java:32:            ra.addFlashAttribute("erro", "Você não tem permissão para acessar o Financeiro.");
+MetaVendaController.java:56:            ra.addFlashAttribute("sucesso", "Metas de " + ym.getMonthValue() + "/" + ym.getYear() + " salvas!");
+MetaVendaController.java:58:            ra.addFlashAttribute("erro", e.getMessage());
+PessoaController.java:50:            .orElseGet(() -> { ra.addFlashAttribute("erro", "Pessoa não encontrada."); return "redirect:/pessoas"; });
+PessoaController.java:61:        try { pessoaService.salvar(pessoa, segmentoIds); ra.addFlashAttribute("sucesso", "Pessoa salva com sucesso!"); }
+PessoaController.java:62:        catch (Exception e) { ra.addFlashAttribute("erro", "Erro: " + e.getMessage()); }
+PessoaController.java:69:        try { pessoaService.excluir(id); ra.addFlashAttribute("sucesso", "Pessoa excluída!"); }
+PessoaController.java:70:        catch (Exception e) { ra.addFlashAttribute("erro", "Não foi possível excluir. Verifique documentos vinculados."); }
+ProdutoController.java:109:                ra.addFlashAttribute("erro", "Produto não encontrado.");
+ProdutoController.java:132:            ra.addFlashAttribute("sucesso", "Produto salvo com sucesso!");
+ProdutoController.java:140:            ra.addFlashAttribute("erro", "Erro ao salvar produto: " + e.getMessage());
+ProdutoController.java:150:            ra.addFlashAttribute("sucesso", "Produto excluído com sucesso!");
+ProdutoController.java:152:            ra.addFlashAttribute("erro", "Não foi possível excluir o produto. Verifique se há documentos vinculados.");
+ProdutoController.java:163:            ra.addFlashAttribute("sucesso", "Status do produto atualizado!");
+ProdutoController.java:165:            ra.addFlashAttribute("erro", e.getMessage());
+TituloController.java:88:                ra.addFlashAttribute("erro", "Só títulos avulsos podem ser editados aqui. Os de documento seguem o documento.");
+TituloController.java:94:            ra.addFlashAttribute("erro", e.getMessage());
+TituloController.java:138:            ra.addFlashAttribute("sucesso", salvos.size() == 1 ? "Título salvo!" : salvos.size() + " títulos lançados!");
+TituloController.java:140:            ra.addFlashAttribute("erro", e.getMessage());
+TituloController.java:161:            ra.addFlashAttribute("erro", e.getMessage());
+TituloController.java:179:            ra.addFlashAttribute("sucesso", "Baixa lançada!" + (b.getBxTaxa().signum() > 0
+TituloController.java:182:            ra.addFlashAttribute("erro", e.getMessage());
+TituloController.java:194:            ra.addFlashAttribute("sucesso", n + (n == 1 ? " título baixado!" : " títulos baixados!"));
+TituloController.java:196:            ra.addFlashAttribute("erro", e.getMessage());
+TituloController.java:205:            ra.addFlashAttribute("sucesso", "Baixa estornada: o título voltou a ficar em aberto.");
+TituloController.java:208:            ra.addFlashAttribute("erro", e.getMessage());
+TituloController.java:217:            ra.addFlashAttribute("sucesso", "Título cancelado.");
+TituloController.java:219:            ra.addFlashAttribute("erro", e.getMessage());
+UnidadeMedidaController.java:44:                ra.addFlashAttribute("erro", "Unidade de medida não encontrada.");
+UnidadeMedidaController.java:59:            ra.addFlashAttribute("sucesso", "Unidade de medida salva!");
+UnidadeMedidaController.java:61:            ra.addFlashAttribute("erro", e.getMessage());
+UnidadeMedidaController.java:71:        ra.addFlashAttribute("sucesso", "Status atualizado!");
+UnidadeMedidaController.java:79:            ra.addFlashAttribute("sucesso", "Unidade de medida excluída!");
+UnidadeMedidaController.java:81:            ra.addFlashAttribute("erro", e.getMessage());
+UsuarioController.java:47:            .orElseGet(() -> { ra.addFlashAttribute("erro", "Usuário não encontrado."); return "redirect:/usuarios"; });
+UsuarioController.java:70:            ra.addFlashAttribute("sucesso", "Usuário salvo com sucesso!");
+UsuarioController.java:72:            ra.addFlashAttribute("erro", "Erro: " + e.getMessage());
+UsuarioController.java:81:            ra.addFlashAttribute("sucesso", "Status do usuário atualizado!");
+UsuarioController.java:83:            ra.addFlashAttribute("erro", e.getMessage());
+UsuarioController.java:90:        try { usuarioService.excluir(id); ra.addFlashAttribute("sucesso", "Usuário excluído!"); }
+UsuarioController.java:91:        catch (IllegalArgumentException e) { ra.addFlashAttribute("erro", e.getMessage()); }
+UsuarioController.java:92:        catch (Exception e) { ra.addFlashAttribute("erro", "Não foi possível excluir."); }
+UsuarioController.java:110:            .orElseGet(() -> { ra.addFlashAttribute("erro", "Usuário não encontrado."); return "redirect:/usuarios"; });
+UsuarioController.java:118:            ra.addFlashAttribute("sucesso", "Perfil aplicado! Valem a partir do próximo login do usuário. Ajuste abaixo o que precisar.");
+UsuarioController.java:120:            ra.addFlashAttribute("erro", "Não foi possível aplicar o perfil: " + e.getMessage());
+UsuarioController.java:132:            ra.addFlashAttribute("sucesso", "Permissões salvas! Valem a partir do próximo login do usuário.");
+UsuarioController.java:134:            ra.addFlashAttribute("erro", "Não foi possível salvar as permissões: " + e.getMessage());
+
+## Regras de negócio (exceções com mensagem) nos services, api e security
+service/AgendaService.java:326: if (d.data() == null || d.hora() == null) throw new IllegalArgumentException("Informe a data e a hora do atendimento.");
+service/AgendaService.java:327: if (d.profissionalId() == null) throw new IllegalArgumentException("Escolha o profissional.");
+service/AgendaService.java:336: throw new IllegalArgumentException("Escolha o cliente ou informe o nome do cliente avulso.");
+service/AgendaService.java:340: if (linhas.isEmpty()) throw new IllegalArgumentException("Escolha pelo menos um serviço.");
+service/AgendaService.java:364: if (dur <= 0 || dur > 1440) throw new IllegalArgumentException("A duração de '" + p.getUprNome() + "' deve ter entre 1 e 1440 minutos.");
+service/AgendaService.java:366: if (valor.signum() < 0) throw new IllegalArgumentException("O valor de '" + p.getUprNome() + "' não pode ser negativo.");
+service/AgendaService.java:394: if (a.getDocumento() != null) throw new IllegalArgumentException("Este atendimento já virou a venda #" + a.getDocumento().getDoctoCodigo() + ". Use Cancelar, não Excluir.");
+service/AgendaService.java:428: if (inicio == null || fim == null) throw new IllegalArgumentException("Informe o início e o fim do bloqueio.");
+service/AgendaService.java:429: if (!fim.isAfter(inicio)) throw new IllegalArgumentException("O fim do bloqueio deve ser depois do início.");
+service/AgendaService.java:456: if (l.diaSemana() < 1 || l.diaSemana() > 7) throw new IllegalArgumentException("Dia da semana inválido.");
+service/AgendaService.java:457: if (!l.fim().isAfter(l.inicio())) throw new IllegalArgumentException("O fim do expediente deve ser depois do início.");
+service/AgendaService.java:458: if ((l.pausaInicio() == null) != (l.pausaFim() == null)) throw new IllegalArgumentException("Informe o início e o fim da pausa, ou deixe os dois em branco.");
+service/AgendaService.java:460: throw new IllegalArgumentException("A pausa deve ficar dentro do expediente.");
+service/CadastroFinanceiroService.java:42: if (t.getTptNome() == null || t.getTptNome().isBlank()) throw new IllegalArgumentException("Informe o nome do tipo.");
+service/CadastroFinanceiroService.java:44: if (t.getTptNatureza() == null) throw new IllegalArgumentException("Informe se o tipo é a receber ou a pagar.");
+service/CadastroFinanceiroService.java:62: if (c.getCfnNome() == null || c.getCfnNome().isBlank()) throw new IllegalArgumentException("Informe o nome da conta.");
+service/CadastroFinanceiroService.java:64: if (c.getCfnTipo() == null) throw new IllegalArgumentException("Informe o tipo da conta.");
+service/CadastroFinanceiroService.java:75: throw new IllegalStateException("Esta conta já tem movimentos. Inative-a em vez de excluir.");
+service/CadastroFinanceiroService.java:78: throw new IllegalStateException("Esta conta já participou de transferências. Inative-a em vez de excluir.");
+service/CadastroFinanceiroService.java:92: if (c.getCatNome() == null || c.getCatNome().isBlank()) throw new IllegalArgumentException("Informe o nome da categoria.");
+service/CadastroFinanceiroService.java:94: if (c.getCatTipo() == null || c.getCatGrupoDre() == null) throw new IllegalArgumentException("Informe o tipo e a linha da DRE.");
+service/CadastroFinanceiroService.java:111: if (!ativo && c.isSistema()) throw new IllegalStateException("Categorias do sistema não podem ser inativadas.");
+service/CadastroFinanceiroService.java:119: if (c.isSistema()) throw new IllegalStateException("Categorias do sistema não podem ser excluídas.");
+service/CadastroFinanceiroService.java:130: if (f.getFpgNome() == null || f.getFpgNome().isBlank()) throw new IllegalArgumentException("Informe o nome da forma de pagamento.");
+service/CadastroFinanceiroService.java:138: throw new IllegalArgumentException("A taxa deve ficar entre 0% e 100%.");
+service/CadastroFinanceiroService.java:141: throw new IllegalArgumentException("Taxa só se aplica a formas de recebimento (tipo a receber).");
+service/CadastroFinanceiroService.java:144: throw new IllegalArgumentException("Prazos não podem ser negativos.");
+service/CadastroFinanceiroService.java:147: if (f.getFpgMaxParcelas() < 1 || f.getFpgMaxParcelas() > 60) throw new IllegalArgumentException("O máximo de parcelas deve ficar entre 1 e 60.");
+service/CadastroFinanceiroService.java:152: if (f.getContaPadrao() == null) throw new IllegalArgumentException("Para baixar automaticamente, escolha a conta de destino.");
+service/CadastroFinanceiroService.java:176: throw new IllegalStateException(mensagemEmUso);
+service/DocumentoService.java:43: throw new IllegalArgumentException("Selecione a forma de pagamento do documento.");
+service/DocumentoService.java:49: throw new IllegalArgumentException("Informe a classificação da " + ("ENTRADA".equals(d.getDoctoTipo()) ? "entrada" : "saída")
+service/DocumentoService.java:53: throw new IllegalArgumentException("Quebra só pode ser lançada em uma saída.");
+service/DocumentoService.java:113: throw new IllegalArgumentException("'" + p.getUprNome() + "' é um serviço e não tem estoque: "
+service/DocumentoService.java:123: throw new IllegalArgumentException("Informe o profissional do serviço '" + p.getUprNome()
+service/DocumentoService.java:134: throw new IllegalArgumentException("O documento deve ter pelo menos um item.");
+service/DocumentoService.java:153: throw new IllegalStateException(
+service/DocumentoService.java:180: throw new IllegalArgumentException("Documento sem ID — use salvar() para novos.");
+service/DocumentoService.java:183: throw new IllegalArgumentException("O documento deve ter pelo menos um item.");
+service/DocumentoService.java:199: throw new IllegalStateException(
+service/DocumentoService.java:243: throw new IllegalStateException(
+service/DocumentoService.java:281: throw new IllegalStateException(
+service/EstoqueService.java:68: throw new IllegalStateException(
+service/FinanceiroService.java:85: throw new IllegalArgumentException("Selecione a forma de pagamento do documento.");
+service/FinanceiroService.java:92: if (!f.isFpgAtivo()) throw new IllegalArgumentException("A forma de pagamento '" + f.getFpgNome() + "' está inativa.");
+service/FinanceiroService.java:94: throw new IllegalArgumentException("A forma '" + f.getFpgNome() + "' não é de "
+service/FinanceiroService.java:100: throw new IllegalArgumentException("A forma '" + f.getFpgNome() + "' baixa automaticamente, mas não tem conta de destino.");
+service/FinanceiroService.java:106: throw new IllegalArgumentException("A forma '" + f.getFpgNome() + "' permite de 1 a " + f.getFpgMaxParcelas() + " parcelas.");
+service/FinanceiroService.java:182: throw new IllegalStateException("O documento tem baixa lançada manualmente no título #" + t.getTitCodigo()
+service/FinanceiroService.java:195: throw new IllegalStateException("O lançamento da baixa #" + b.getBxCodigo()
+service/FinanceiroService.java:232: if (titIds == null || titIds.isEmpty()) throw new IllegalArgumentException("Marque pelo menos um título.");
+service/FinanceiroService.java:238: if (!t.isEmAberto()) throw new IllegalArgumentException("O título #" + id + " não está em aberto.");
+service/FinanceiroService.java:250: throw new IllegalArgumentException("A forma '" + f.getFpgNome() + "' não combina com um título " +
+service/FinanceiroService.java:258: if (!t.isEmAberto()) throw new IllegalStateException("O título #" + t.getTitCodigo() + " não está em aberto.");
+service/FinanceiroService.java:263: if (valor.signum() <= 0) throw new IllegalArgumentException("Informe um valor maior que zero.");
+service/FinanceiroService.java:265: throw new IllegalArgumentException("O valor da baixa (R$ " + valor + ") é maior que o saldo do título (R$ " + t.getSaldo() + ").");
+service/FinanceiroService.java:268: throw new IllegalArgumentException("Juros, multa e desconto não podem ser negativos.");
+service/FinanceiroService.java:271: throw new IllegalArgumentException("O desconto não pode ser maior que o valor da baixa.");
+service/FinanceiroService.java:350: if (b.isBxEstornada()) throw new IllegalStateException("Esta baixa já foi estornada.");
+service/FinanceiroService.java:379: throw new IllegalStateException("A taxa de cartão é desfeita estornando a baixa que a gerou.");
+service/FinanceiroService.java:381: if (t.getTitStatus() == Fin.StatusTitulo.CANCELADO) throw new IllegalStateException("O título já está cancelado.");
+service/FinanceiroService.java:383: throw new IllegalStateException("O título tem baixas. Estorne as baixas antes de cancelar.");
+service/FinanceiroService.java:399: if (d.descricao() == null || d.descricao().isBlank()) throw new IllegalArgumentException("Informe a descrição.");
+service/FinanceiroService.java:400: if (d.valor() == null || d.valor().signum() <= 0) throw new IllegalArgumentException("Informe um valor maior que zero.");
+service/FinanceiroService.java:401: if (d.vencimento() == null) throw new IllegalArgumentException("Informe o vencimento.");
+service/FinanceiroService.java:412: if (t.getTitOrigem() != Fin.OrigemTitulo.AVULSO) throw new IllegalStateException("Só títulos avulsos podem ser editados aqui. Os de documento seguem o documento.");
+service/FinanceiroService.java:414: throw new IllegalStateException("O título já tem baixa ou foi cancelado. Estorne as baixas antes de editar.");
+service/FinanceiroService.java:428: if (d.natureza() == null) throw new IllegalArgumentException("Informe se é a receber ou a pagar.");
+service/FinanceiroService.java:459: if (f.getNatureza() != natureza) throw new IllegalArgumentException("A forma '" + f.getFpgNome() + "' não combina com a natureza do título.");
+service/FinanceiroService.java:505: if (!c.isCfnAtivo()) throw new IllegalArgumentException("A conta '" + c.getCfnNome() + "' está inativa.");
+service/MetaVendaService.java:104: if (valor != null && valor.signum() < 0) throw new IllegalArgumentException("A meta não pode ser negativa.");
+service/PessoaService.java:90: throw new IllegalArgumentException("O segmento \"" + s.getSegNome() + "\" está inativo.");
+service/PessoaService.java:122: throw new CpfDuplicadoException("Já existe uma pessoa cadastrada com este CPF/CNPJ.");
+service/ProdutoService.java:63: throw new IllegalArgumentException("Este produto ainda tem " + estoqueAtual.getEstQtd().stripTrailingZeros().toPlainString()
+service/ProdutoService.java:96: throw new IllegalArgumentException("Para trocar a unidade base (" + atual + "), remova antes as "
+service/ProdutoService.java:119: throw new IllegalStateException("Defina o preço do produto \"" + p.getUprNome()
+service/ProdutoUnidadeService.java:67: throw new IllegalArgumentException("Escolha a unidade em todas as linhas de unidades adicionais.");
+service/ProdutoUnidadeService.java:73: throw new IllegalArgumentException("A unidade '" + sigla + "' já é a unidade base do produto.");
+service/ProdutoUnidadeService.java:76: throw new IllegalArgumentException("A unidade '" + sigla + "' está repetida.");
+service/ProdutoUnidadeService.java:79: throw new IllegalArgumentException("Informe quantas " + base + " cabem em 1 " + sigla + " (maior que zero).");
+service/ProdutoUnidadeService.java:82: throw new IllegalArgumentException("O fator de " + sigla + " é grande demais (máximo 1.000.000).");
+service/ProdutoUnidadeService.java:85: throw new IllegalArgumentException("O preço de " + sigla + " deve ser maior que zero (ou deixe em branco).");
+service/SegmentoService.java:33: if (!s.isSegAtivo()) throw new IllegalArgumentException("O segmento \"" + s.getSegNome() + "\" está inativo.");
+service/TransferenciaContaService.java:47: if (origemId == null) throw new IllegalArgumentException("Escolha a conta de origem.");
+service/TransferenciaContaService.java:48: if (destinoId == null) throw new IllegalArgumentException("Escolha a conta de destino.");
+service/TransferenciaContaService.java:49: if (origemId.equals(destinoId)) throw new IllegalArgumentException("A conta de origem e a de destino precisam ser diferentes.");
+service/TransferenciaContaService.java:50: if (valor == null) throw new IllegalArgumentException("Informe o valor da transferência.");
+service/TransferenciaContaService.java:52: if (v.signum() <= 0) throw new IllegalArgumentException("O valor da transferência deve ser maior que zero.");
+service/TransferenciaContaService.java:58: if (!origem.isCfnAtivo()) throw new IllegalArgumentException("A conta de origem \"" + origem.getCfnNome() + "\" está inativa.");
+service/TransferenciaContaService.java:59: if (!destino.isCfnAtivo()) throw new IllegalArgumentException("A conta de destino \"" + destino.getCfnNome() + "\" está inativa.");
+service/TransferenciaContaService.java:62: if (obs != null && obs.length() > TAMANHO_DESCRICAO) throw new IllegalArgumentException("A observação deve ter no máximo 200 caracteres.");
+service/TransferenciaContaService.java:86: if (t.isTrfEstornada()) throw new IllegalStateException("Esta transferência já foi estornada.");
+service/TransferenciaContaService.java:89: throw new IllegalStateException("Uma das contas já conciliou esta transferência. Desfaça a conciliação nos extratos antes de estornar.");
+service/UnidadeMedidaService.java:92: throw new IllegalArgumentException("A unidade de medida '" + u.getUndSigla() + "' está inativa.");
+service/UnidadeMedidaService.java:100: if (sigla.isEmpty()) throw new IllegalArgumentException("Informe a sigla da unidade.");
+service/UnidadeMedidaService.java:101: if (sigla.length() > 10) throw new IllegalArgumentException("A sigla pode ter no máximo 10 caracteres.");
+service/UnidadeMedidaService.java:102: if (sigla.chars().anyMatch(Character::isWhitespace)) throw new IllegalArgumentException("A sigla não pode ter espaços.");
+service/UnidadeMedidaService.java:103: if (descricao.isEmpty()) throw new IllegalArgumentException("Informe a descrição da unidade.");
+service/UnidadeMedidaService.java:104: if (descricao.length() > 60) throw new IllegalArgumentException("A descrição pode ter no máximo 60 caracteres.");
+service/UnidadeMedidaService.java:108: throw new IllegalArgumentException("Já existe a unidade '" + mesmaSigla.get().getUndSigla() + "'.");
+service/UnidadeMedidaService.java:120: throw new IllegalArgumentException("A sigla '" + u.getUndSigla() + "' é usada por " + uso
+service/UnidadeMedidaService.java:143: throw new IllegalArgumentException("Não é possível excluir '" + u.getUndSigla() + "': " + uso
+service/UsuarioService.java:52: throw new IllegalArgumentException("A pessoa \"" + p.getUpsNome() + "\" não está cadastrada como vendedor ativo.");
+service/UsuarioService.java:75: .ifPresent(outro -> { throw new IllegalArgumentException("Já existe um usuário com o login \"" + login + "\"."); });
+service/UsuarioService.java:93: throw new IllegalArgumentException("O login do administrador não pode ser alterado.");
+service/UsuarioService.java:96: throw new IllegalArgumentException("O administrador não pode ser inativado.");
+service/UsuarioService.java:127: throw new IllegalArgumentException("O administrador sempre tem acesso total; não há perfil a aplicar.");
+service/UsuarioService.java:194: throw new IllegalArgumentException("O administrador não pode ser inativado.");
+service/UsuarioService.java:204: throw new IllegalArgumentException("O administrador não pode ser excluído.");
+api/ApiAuthController.java:40: throw new ApiException(400, "Informe o login e a senha.");
+api/ApiAuthController.java:45: throw new ApiException(429, "Muitas tentativas de login. Aguarde alguns minutos e tente novamente.");
+api/ApiAuthController.java:52: throw new ApiException(401, "Login ou senha inválidos.");
+api/ApiAuthController.java:56: throw new ApiException(403, "Este usuário não tem acesso ao aplicativo de vendas. Peça ao administrador para liberar.");
+api/ApiClienteService.java:27: if (req == null) throw new ApiException(400, "Dados do cliente não informados.");
+api/ApiClienteService.java:29: if (nome.isEmpty()) throw new ApiException(400, "Informe o nome do cliente.");
+api/ApiClienteService.java:30: if (nome.length() > 150) throw new ApiException(400, "O nome deve ter no máximo 150 caracteres.");
+api/ApiClienteService.java:33: if (documento != null && documento.length() > 20) throw new ApiException(400, "CPF/CNPJ inválido.");
+api/ApiClienteService.java:34: if (telefone != null && telefone.length() > 20) throw new ApiException(400, "Telefone inválido.");
+api/ApiClienteService.java:36: throw new ApiException(400, "A data de nascimento não pode ser futura.");
+api/ApiClienteService.java:53: throw new ApiException(409, e.getMessage());
+api/ApiPedidoService.java:63: if (!meu) throw new ApiException(404, "Pedido não encontrado.");
+api/ApiPedidoService.java:71: throw new ApiException(409, "Seu usuário não tem vendedor vinculado. Peça ao administrador para vincular um vendedor ao seu usuário.");
+api/ApiPedidoService.java:74: throw new ApiException(400, "Adicione pelo menos um item ao pedido.");
+api/ApiPedidoService.java:76: if (req.clienteId() == null) throw new ApiException(400, "Escolha o cliente.");
+api/ApiPedidoService.java:77: if (req.formaPagamentoId() == null) throw new ApiException(400, "Escolha a forma de pagamento.");
+api/ApiPedidoService.java:81: throw new ApiException(400, "A pessoa \"" + cliente.getUpsNome() + "\" não é um cliente ativo.");
+api/ApiPedidoService.java:86: if (data.isAfter(hoje)) throw new ApiException(400, "A data do pedido não pode ser futura.");
+api/ApiPedidoService.java:87: if (data.isBefore(hoje.minusDays(30))) throw new ApiException(400, "A data do pedido não pode ser anterior a 30 dias.");
+api/ApiPedidoService.java:97: if (it == null || it.produtoId() == null) throw new ApiException(400, "Há um item sem produto.");
+api/ApiPedidoService.java:100: if (!p.isUprAtivo()) throw new ApiException(400, "O produto \"" + p.getUprNome() + "\" está inativo.");
+api/ApiPedidoService.java:102: throw new ApiException(400, "Informe a quantidade de \"" + p.getUprNome() + "\".");
+api/ApiPedidoService.java:109: throw new ApiException(400, e.getMessage());
+api/ApiPedidoService.java:112: if (valor.signum() <= 0) throw new ApiException(400, "Informe o valor unitário de \"" + p.getUprNome() + "\".");
+api/ApiTokenService.java:77: throw new IllegalStateException(e);
+api/ApiVendasController.java:46: throw new ApiException(403, "Seu usuário não tem permissão para cadastrar clientes.");
+api/ApiVendasController.java:105: throw new ApiException(403, acao == Acao.CONSULTA
+api/VendedorApiController.java:40: throw new ApiException(403, "Seu usuário não tem acesso ao aplicativo de vendas.");
+controller/AgendaController.java:138: if (agdCodigo != null && !escopo.podeVer(agenda.buscar(agdCodigo).orElse(null))) throw new IllegalArgumentException(MSG_SO_PROPRIOS);
+controller/AgendaController.java:140: if (restrito == AgendaEscopo.NENHUM) throw new IllegalArgumentException(
+controller/AgendaController.java:167: if (!escopo.podeVer(a)) throw new IllegalArgumentException(MSG_SO_PROPRIOS);
+controller/AgendaController.java:181: if (!escopo.podeVer(a)) throw new IllegalArgumentException(MSG_SO_PROPRIOS);
+controller/AgendaController.java:232: if (restrito == AgendaEscopo.NENHUM) throw new IllegalArgumentException("Seu usuário não tem vendedor vinculado.");
+controller/AgendaController.java:249: throw new IllegalArgumentException("Você só pode apagar bloqueios da sua própria agenda.");
+controller/AgendaController.java:285: if (restrito == AgendaEscopo.NENHUM) throw new IllegalArgumentException("Seu usuário não tem vendedor vinculado.");
+controller/AgendaController.java:306: throw new IllegalArgumentException("Hora inválida: " + lista.get(i));
+controller/DocumentoController.java:191: if (!escopo.podeVer(atual)) throw new IllegalArgumentException(MSG_SO_PROPRIAS);
+controller/DocumentoController.java:308: if (alvo != null && !escopo.podeVer(alvo)) throw new IllegalArgumentException(MSG_SO_PROPRIAS);
+controller/TituloController.java:132: throw new IllegalArgumentException("Competência inválida.");
