@@ -38,6 +38,11 @@
 | T-18 | Limite de login em memória (IP+login e IP), mesmos números e janela | SEG-09 |
 | T-19 | Tabela rota → módulo → ação **explícita e testada** (cada rota, cada ação), espelhando `PermissaoInterceptor` | SEG-11 |
 | T-20 | Admin inicial por `ADMIN_SENHA_INICIAL` obrigatória, sem senha padrão (decisão D-01); a migração recusa concluir se o hash do admin ainda for o do `Admin@123` | SEG-03 |
+| T-21 | **Direitos lidos do banco a cada requisição** (nome, situação ativa e as 4 ações por módulo), não congelados na sessão. Mudar uma permissão ou inativar o usuário vale na hora; no antigo valia só no próximo login. Custo: 2 consultas pequenas por tela, no pool de leitura | SEG-04, SEG-10 (melhoria de segurança, sem efeito visual) |
+| T-22 | **Dependências de CDN servidas pelo próprio sistema** (decisão D-04): Font Awesome 6.5.0 (CSS + woff2), Chart.js 4.4.1 (UMD) e as fontes Inter 400–700 e Cormorant Garamond 400/600 (normal e itálico), subconjunto `latin`, vindos dos pacotes oficiais do npm (`@fortawesome/fontawesome-free`, `chart.js`, `@fontsource/*`) e guardados em `web/static/vendor/` com as licenças em `vendor/licencas/`. Sem requisição a terceiros: nenhum dado do usuário vai para Google/Cloudflare e o sistema funciona sem internet na rede da loja | UI-06 |
+| T-23 | **Estáticos com hash no nome** (`/css/style-<32 hex do SHA-256>.css`) calculado na subida a partir do embed; o caminho sem hash também responde (como o Spring); URL com hash errado dá 404. Versionados: `max-age=31536000, immutable`; `vendor/` sem hash: 30 dias; o resto sem hash: `no-cache` + ETag (304) | INF-08 |
+| T-24 | **Cookie de sessão `JSESSIONID`** com 256 bits aleatórios; no banco fica **só o SHA-256** do identificador (quem lê o arquivo do banco ou um backup não consegue usar as sessões). Sessão anônima só para o token CSRF do formulário de login (30 min), trocada por uma sessão nova no login | SEG-05, SEG-07, SEG-08 |
+| T-25 | **IP do cliente atrás do Caddy** (`PROXY_CONFIAVEL`, padrão ligado em prod): vale o **último** valor de `X-Forwarded-For`, que o Caddy grava e não deixa o cliente forjar. Deixar ligado com o app exposto direto na internet permitiria forjar o IP e escapar do bloqueio de login (aviso no `.env.example`) | SEG-09 |
 
 ## Estrutura do repositório (proposta)
 ```

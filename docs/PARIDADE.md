@@ -16,10 +16,10 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 | INF-02 | SQLite via `modernc.org/sqlite`: WAL, `busy_timeout`, `foreign_keys=ON`, **uma conexão de escrita**, transações em documento/estoque/financeiro | RN-DOC-06 | I | feito (I ✔) |
 | INF-03 | Migrations versionadas embutidas (convertendo `schema.sql` + `02`–`13`), controle de versão, rodam no boot; script destrutivo nunca roda sozinho | §4 | I | feito (I ✔) |
 | INF-04 | Configuração 100 % por variáveis de ambiente + `.env.example` comentado (PORT, DB_PATH, DOMINIO, COOKIE_SECURE, perfil prod, limites de login, backup GDRIVE_*, retenção, horário, admin inicial) | §3 | I | feito (U ✔ `internal/config` + `.env.example`; falta ligar ao `main`) |
-| INF-05 | Perfil `prod`: cookie seguro, logs enxutos, recusa configuração insegura (sem senha padrão), shutdown gracioso, compressão | `application-prod.properties` | I | pendente (recusa de config insegura U ✔; faltam cookie, logs, shutdown e compressão no servidor) |
-| INF-06 | Healthcheck HTTP (`/login` 200 ou `/healthz`) e `HEALTHCHECK` no Docker | Dockerfile | S | pendente |
+| INF-05 | Perfil `prod`: cookie seguro, logs enxutos, recusa configuração insegura (sem senha padrão), shutdown gracioso, compressão | `application-prod.properties` | I | feito (cookie `Secure` e HSTS em prod I ✔; recusa de config insegura U ✔; log JSON e desligamento gracioso implementados sem teste automatizado; compressão fica no Caddy) |
+| INF-06 | Healthcheck HTTP (`/login` 200 ou `/healthz`) e `HEALTHCHECK` no Docker | Dockerfile | S | feito (`/healthz` I ✔ e `aurea healthcheck` prontos; falta o `HEALTHCHECK` no Dockerfile) |
 | INF-07 | Fuso `America/Sao_Paulo` (tzdata embutido) para "hoje", "mês atual", DRE e metas | §8-5 | U, I | feito (U ✔ fuso embutido; falta aplicar nas telas) |
-| INF-08 | Estáticos com URL versionada por hash do conteúdo e cache de 365 dias em `prod` | §8-8 | I | pendente |
+| INF-08 | Estáticos com URL versionada por hash do conteúdo e cache de 365 dias em `prod` | §8-8 | I | testado (I ✔: toda URL de CSS/JS/imagem/vendor das telas vem com hash, responde 200, `Cache-Control` de 365 dias e 304 com ETag; hash errado dá 404) |
 | INF-09 | Página de erro 404/500 simples em português mantendo o status HTTP ⚠ D-11 | screenshot `rota-inexistente` | E | pendente |
 | INF-10 | Dockerfile multi-stage, imagem final mínima, usuário não-root | `Dockerfile` | S | pendente |
 | INF-11 | `docker-compose.yml`: app + Caddy (HTTPS automático) + serviço de backup, volume do SQLite, `mem_limit` | `docker-compose.yml` | S | pendente |
@@ -34,15 +34,15 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 | SEG-01 | Login por formulário (`login`, `senha`), logout, redirecionamentos e mensagens de `/login` (erro, logout, expirada, bloqueado) | §1, §3 | I, E | pendente |
 | SEG-02 | **Hashes BCrypt existentes continuam válidos** (`$2a$10$…`); novos hashes BCrypt fator 10 | RN-SEG-01 | U, I, M | feito (U ✔ com hashes reais do Java; faltam I, M) |
 | SEG-03 | Sem senha padrão em produção: admin inicial por variável/primeiro boot ⚠ D-01 | pedido | I | feito (I ✔ com SQLite real: cria, recusa sem senha, recusa senha fraca, recusa hash do `Admin@123`; falta teste do boot completo) |
-| SEG-04 | Usuário inativo não entra | RN-USR | I | pendente |
-| SEG-05 | **Sessão única por usuário** (novo login expira a antiga → `/login?expired=true`), sessões em memória, uma instância ⚠ D-12 | §3 | I | pendente |
-| SEG-06 | Sessão web 8 h; **app instalado** (`modoApp=1`) 30 dias sem uso com cookie persistente (`SESSAO_APP_DIAS`, 0 desliga) | `SessaoApp` | I | pendente |
-| SEG-07 | Cookie `HttpOnly`, `SameSite=Lax`, `Secure` por `COOKIE_SECURE` | §3 | I | pendente |
-| SEG-08 | **CSRF** em todas as telas POST; desligado em `/api/**`; `/vendedor/api` exige CSRF (403 sem) | §2, §3 | I | pendente |
-| SEG-09 | **Limite de login**: 5 erros por IP+login / 30 por IP → bloqueio de 15 min (formulário e API, 429), janela e zeragem no sucesso, em memória | `LoginThrottle` | U, I, C | pendente |
-| SEG-10 | 21 módulos × 4 direitos: tabela `Direito_Usuario`, authorities `MODULO_ACAO`, **`admin` sempre tem tudo** | `Permissoes` | U, I | feito (U ✔; falta I) |
-| SEG-11 | Mapa rota → módulo → ação (inclui `salvar` com/sem id; `/agenda/bloqueios|horarios`; `/vendedor`, `/vendedor/api`; BI e `/financeiro` validados no controller) | `PermissaoInterceptor` | U, I | feito (U ✔; falta I) |
-| SEG-12 | Negação: flash `erro` "Você não tem permissão para …" e redirect a `/dashboard` | §1 | I, E | pendente |
+| SEG-04 | Usuário inativo não entra | RN-USR | I | testado (I ✔: inativo não entra; inativar derruba a sessão em curso) |
+| SEG-05 | **Sessão única por usuário** (novo login expira a antiga → `/login?expired=true`), sessões em memória, uma instância ⚠ D-12 | §3 | I | testado (I ✔: novo login → a antiga vai a `/login?expired=true`; sessões persistidas no SQLite, sobrevivem a reinício ⚠ D-12) |
+| SEG-06 | Sessão web 8 h; **app instalado** (`modoApp=1`) 30 dias sem uso com cookie persistente (`SESSAO_APP_DIAS`, 0 desliga) | `SessaoApp` | I | testado (I ✔: 8 h de inatividade no navegador; app instalado 30 dias com `Max-Age`; variável `SESSION_APP_DIAS`) |
+| SEG-07 | Cookie `HttpOnly`, `SameSite=Lax`, `Secure` por `COOKIE_SECURE` | §3 | I | testado (I ✔: `HttpOnly`, `SameSite=Lax`, `Secure` por `COOKIE_SECURE` ou prod; id novo a cada login; só o SHA-256 vai ao banco) |
+| SEG-08 | **CSRF** em todas as telas POST; desligado em `/api/**`; `/vendedor/api` exige CSRF (403 sem) | §2, §3 | I | feito (I ✔ nas telas, no login e no logout por POST; cabeçalho `X-CSRF-TOKEN` aceito; falta `/api` sem CSRF e `/vendedor/api`) |
+| SEG-09 | **Limite de login**: 5 erros por IP+login / 30 por IP → bloqueio de 15 min (formulário e API, 429), janela e zeragem no sucesso, em memória | `LoginThrottle` | U, I, C | feito (U ✔ + I ✔: 5 por IP+login, 30 por IP, 15 min, zera no sucesso, IP do `X-Forwarded-For` atrás do Caddy; falta C e o 429 da API) |
+| SEG-10 | 21 módulos × 4 direitos: tabela `Direito_Usuario`, authorities `MODULO_ACAO`, **`admin` sempre tem tudo** | `Permissoes` | U, I | testado (U ✔ + I ✔: o menu e o porteiro seguem os direitos lidos do banco a cada pedido) |
+| SEG-11 | Mapa rota → módulo → ação (inclui `salvar` com/sem id; `/agenda/bloqueios|horarios`; `/vendedor`, `/vendedor/api`; BI e `/financeiro` validados no controller) | `PermissaoInterceptor` | U, I | testado (U ✔ 85 rotas + I ✔ no porteiro real: Produtos, Pessoas, BI, lucratividade) |
+| SEG-12 | Negação: flash `erro` "Você não tem permissão para …" e redirect a `/dashboard` | §1 | I, E | feito (I ✔: mensagem por ação, de uma só leitura, volta ao `/dashboard`; falta E) |
 | SEG-13 | Perfis prontos: Vendedor da loja, Profissional do salão, Recepção, Gerência (aplicar na criação e na tela de permissões, substitui tudo, não vale para admin) | `PerfisAcesso` | U, I | feito (U ✔; falta I) |
 | SEG-14 | Escopo de vendas (`VENDAS_TODOS`): lista, abrir/editar/excluir, dashboard, relatório de documentos, BI/lucratividade bloqueados; sem vendedor vinculado = nada | `EscopoVendas` | I, E | pendente |
 | SEG-15 | Escopo da agenda (`AGENDA_TODOS`): só a própria agenda; servidor ignora o profissional enviado | `AgendaEscopo` | I | pendente |
@@ -182,12 +182,12 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 
 | ID | Funcionalidade | Referência | Testes | Status |
 |---|---|---|---|---|
-| UI-01 | Layout base: menu lateral por permissão (grupos Loja/Salão/Gerência, financeiro), topo, rodapé, alertas flash | `layout/base.html` | I, E | pendente |
-| UI-02 | Tokens de tema `--silver*` (claro), tema escuro, 4 destaques, 3 densidades, preferências no `localStorage` (`aurea-*`) sem "piscar" (`tema-init.js`) | `style.css` | E | pendente |
-| UI-03 | Menu recolhível, grupos do menu, menu do usuário, paleta Ctrl+K (telas por permissão + aparência) | `main.js` | E | pendente |
+| UI-01 | Layout base: menu lateral por permissão (grupos Loja/Salão/Gerência, financeiro), topo, rodapé, alertas flash | `layout/base.html` | I, E | feito (menu por permissão e mensagens I ✔; falta E e a comparação visual) |
+| UI-02 | Tokens de tema `--silver*` (claro), tema escuro, 4 destaques, 3 densidades, preferências no `localStorage` (`aurea-*`) sem "piscar" (`tema-init.js`) | `style.css` | E | feito (CSS e JS copiados sem alteração; vistos no navegador; falta E) |
+| UI-03 | Menu recolhível, grupos do menu, menu do usuário, paleta Ctrl+K (telas por permissão + aparência) | `main.js` | E | feito (`main.js` copiado sem alteração; iniciais e menu vistos no navegador; falta E) |
 | UI-04 | **Comparação visual** de cada tela (49) contra `docs/referencia/`, desktop e celular, tolerância definida | `docs/referencia` | E | pendente |
 | UI-05 | Acessibilidade básica (landmarks, rótulos, foco, contraste) em todas as telas | pedido | E | pendente |
-| UI-06 | Fontes (Inter + Cormorant) e ícones/Chart.js: CDN ou servidos localmente ⚠ D-02, D-04 | §5 | E | pendente |
+| UI-06 | Fontes (Inter + Cormorant) e ícones/Chart.js: CDN ou servidos localmente ⚠ D-02, D-04 | §5 | E | feito (decisão D-04: Font Awesome 6.5.0, Chart.js 4.4.1, Inter e Cormorant servidos de `web/static/vendor`; no navegador nenhuma requisição externa; falta E) |
 | UI-07 | Formulários: validação do navegador + mensagens do servidor, listas dinâmicas de itens, JS de documento/agenda | templates | E | pendente |
 | UI-08 | Estilos de impressão | `style.css` | E | pendente |
 

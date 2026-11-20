@@ -1,0 +1,124 @@
+/* ══════════════════════════════════════════════════════════════
+   MODO VENDEDOR: telas de celular com o fluxo do aplicativo Android.
+   Usa os mesmos tokens do site (claro, escuro e cor de destaque funcionam sozinhos).
+═══════════════════════════════════════════════════════════════ */
+:root { --vd-bar: #2b2c2f; --vd-bar-fg: #e5e6e8; --vd-bar-mut: #9a9da3; --vd-linha: var(--border); }
+html[data-theme="dark"] { --vd-bar: #202226; --vd-bar-fg: #e7e8ea; --vd-bar-mut: #8d9096; }
+
+body.vd-body { display: block; min-height: 100vh; min-height: 100dvh; background: var(--bg); overflow: hidden; }
+
+.vd-app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; max-width: 720px; margin: 0 auto; background: var(--bg); position: relative; }
+.vd-carregando, .vd-sem-js { margin: auto; color: var(--muted); font-size: 15px; }
+
+/* barra de cima (como a do app: grafite com texto prata) */
+.vd-topo { flex: 0 0 auto; display: flex; align-items: center; gap: .25rem; padding: .35rem .5rem .35rem .75rem; min-height: 56px; background: var(--vd-bar); color: var(--vd-bar-fg); }
+.vd-topo h1 { flex: 1; min-width: 0; margin: 0; font: 600 18px var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--vd-bar-fg); }
+.vd-icone { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: transparent; color: var(--vd-bar-fg); font-size: 18px; cursor: pointer; flex: 0 0 auto; }
+.vd-icone:active { background: rgba(255,255,255,.14); }
+.vd-icone[disabled] { opacity: .35; }
+.vd-topo-busca { flex: 1; min-width: 0; height: 44px; border: 0; outline: 0; background: transparent; color: var(--vd-bar-fg); font: 400 16px var(--font-body); }
+.vd-topo-busca::placeholder { color: var(--vd-bar-mut); }
+
+.vd-barra-progresso { flex: 0 0 3px; height: 3px; background: transparent; overflow: hidden; }
+.vd-barra-progresso.on { background: linear-gradient(90deg, transparent, var(--silver-light), transparent); background-size: 50% 100%; background-repeat: no-repeat; animation: vd-vai 1s linear infinite; }
+@keyframes vd-vai { from { background-position: -50% 0; } to { background-position: 150% 0; } }
+
+.vd-corpo { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
+.vd-corpo.com-pad { padding: 1rem; }
+
+/* abas de baixo */
+.vd-abas { flex: 0 0 auto; display: flex; background: var(--vd-bar); padding: .35rem 0 calc(.35rem + env(safe-area-inset-bottom)); }
+.vd-aba { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; border: 0; background: transparent; color: var(--vd-bar-mut); font: 500 12px var(--font-body); padding: .35rem 0; cursor: pointer; min-height: 48px; }
+.vd-aba i { font-size: 20px; }
+.vd-aba.on { color: var(--vd-bar-fg); }
+.vd-aba.on i { color: var(--silver-light); }
+
+/* listas */
+.vd-linha { padding: .8rem 1rem; border-bottom: 1px solid var(--vd-linha); background: var(--bg-white); cursor: pointer; }
+.vd-linha:active { background: var(--silver-bg); }
+.vd-linha.sem-toque { cursor: default; }
+.vd-linha.sem-toque:active { background: var(--bg-white); }
+.vd-linha-l1 { display: flex; justify-content: space-between; align-items: center; gap: .75rem; }
+.vd-linha-l1 strong { font-weight: 600; font-size: 15px; color: var(--dark); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.vd-valor { font-weight: 700; color: var(--silver-dark); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.vd-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.vd-estoque { text-align: right; flex: 0 0 auto; }
+.vd-estoque b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+.vd-estoque span { font-size: 11px; color: var(--muted); }
+.vd-ok { color: var(--green); }
+.vd-ruim { color: var(--red); }
+.vd-vazio { padding: 2.5rem 1rem; text-align: center; color: var(--muted); font-size: 14px; }
+.vd-alerta { margin: 1rem; padding: .85rem 1rem; border-radius: var(--radius); background: var(--red-bg); border: 1px solid var(--red-bd); color: var(--red); font-size: 13px; }
+.vd-dica { padding: .5rem 1rem; color: var(--muted); font-size: 12px; }
+
+/* chips de filtro */
+.vd-chips { display: flex; gap: .5rem; padding: .6rem 1rem; flex-wrap: wrap; }
+.vd-chip { border: 1px solid var(--border); background: var(--bg-white); color: var(--mid); border-radius: 999px; padding: .5rem .95rem; font: 500 14px var(--font-body); cursor: pointer; min-height: 40px; }
+.vd-chip.on { background: var(--inverse-bg); border-color: var(--inverse-bg); color: var(--inverse-fg); }
+
+/* novo pedido */
+.vd-cabeca { display: flex; justify-content: space-between; gap: 1rem; padding: .85rem 1rem; background: var(--bg-white); border-bottom: 1px solid var(--vd-linha); }
+.vd-rot { color: var(--muted); font-size: 12px; }
+.vd-escolher { font-weight: 600; cursor: pointer; }
+.vd-escolher.vazio { color: var(--silver-dark); }
+/* faixa própria para o botão (o traço passa por trás dele, como no app); os itens começam abaixo, sem sobreposição */
+.vd-fab-linha { position: relative; height: 64px; margin: 0 1rem; }
+.vd-fab-linha::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--vd-linha); }
+.vd-fab { position: absolute; right: 0; top: 4px; width: 56px; height: 56px; border-radius: 16px; border: 0; background: var(--silver-grad); color: #fff; font-size: 22px; box-shadow: var(--shadow-md); cursor: pointer; z-index: 2; }
+.vd-fab:active { transform: scale(.96); }
+.vd-fab-solto { position: absolute; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); }
+.vd-item { display: flex; align-items: center; gap: .5rem; padding: .7rem 1rem; border-bottom: 1px solid var(--vd-linha); background: var(--bg-white); cursor: pointer; }
+.vd-item-corpo { flex: 1; min-width: 0; }
+.vd-item-corpo strong { font-weight: 600; font-size: 14px; display: block; }
+.vd-item-l2 { display: flex; justify-content: space-between; gap: .5rem; color: var(--muted); font-size: 13px; }
+.vd-remover { width: 44px; height: 44px; border: 0; background: transparent; color: var(--red); font-size: 17px; border-radius: 50%; cursor: pointer; flex: 0 0 auto; }
+.vd-totais { display: flex; justify-content: space-between; padding: .6rem 1rem; background: var(--bg-white); border-top: 1px solid var(--vd-linha); border-bottom: 1px solid var(--vd-linha); }
+.vd-totais b { display: block; font-weight: 500; font-variant-numeric: tabular-nums; }
+.vd-totais b.forte { font-weight: 700; color: var(--silver-dark); }
+.vd-rodape { flex: 0 0 auto; padding: .75rem 1rem calc(.75rem + env(safe-area-inset-bottom)); background: var(--bg-white); }
+.vd-rodape .vd-clicavel { padding: .4rem 0; font-size: 16px; cursor: pointer; }
+.vd-parcelas { display: flex; align-items: center; gap: .75rem; margin-top: .5rem; }
+.vd-parcelas b { min-width: 2.5ch; text-align: center; }
+.vd-passo { width: 44px; height: 44px; border: 1px solid var(--border-strong, var(--border)); border-radius: 10px; background: var(--bg-white); color: var(--dark); font-size: 20px; cursor: pointer; }
+
+/* formulários (16px evita o zoom automático do iPhone) */
+.vd-campo { display: block; margin-bottom: .9rem; }
+.vd-campo > span { display: block; margin-bottom: .25rem; color: var(--mid); font-size: 13px; font-weight: 500; }
+.vd-campo input, .vd-campo .vd-falso { width: 100%; min-height: 48px; padding: .6rem .8rem; border: 1.5px solid var(--input-bd); border-radius: 10px; background: var(--input-bg); color: var(--dark); font: 400 16px var(--font-body); }
+.vd-campo input:focus { outline: none; border-color: var(--silver); box-shadow: 0 0 0 3px var(--focus-ring); }
+.vd-campo input.erro { border-color: var(--red); }
+.vd-campo .vd-falso { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.vd-campo .vd-falso.so-leitura { cursor: default; background: var(--silver-bg); }
+.vd-erro-linha { color: var(--red); font-size: 12px; margin: -.4rem 0 .6rem; }
+.vd-grade3 { display: flex; gap: .6rem; }
+.vd-grade3 .vd-campo { flex: 1; min-width: 0; }
+.vd-resumo-linha { display: flex; justify-content: space-between; gap: .5rem; font-size: 13px; margin: .35rem 0 1rem; }
+.vd-botao { display: block; width: 100%; min-height: 50px; border: 0; border-radius: 12px; background: var(--silver-grad); color: #fff; font: 600 16px var(--font-body); cursor: pointer; }
+.vd-botao[disabled] { opacity: .5; }
+.vd-secao { margin: 1.25rem 0 .35rem; color: var(--muted); font-size: 13px; }
+
+/* detalhe do pedido */
+.vd-detalhe-topo { padding: 1rem; background: var(--silver-bg); border-bottom: 1px solid var(--vd-linha); }
+.vd-detalhe-topo h2 { margin: 0 0 .35rem; font: 700 18px var(--font-body); color: var(--dark); }
+.vd-detalhe-topo div { font-size: 14px; }
+.vd-total-final { display: flex; justify-content: space-between; padding: 1rem; font-size: 18px; font-weight: 700; background: var(--bg-white); border-top: 1px solid var(--vd-linha); }
+
+/* janelas sobrepostas (menu, forma de pagamento) */
+.vd-fundo { position: absolute; inset: 0; z-index: 30; background: var(--overlay); display: flex; align-items: flex-end; justify-content: center; }
+.vd-fundo.menu { align-items: flex-start; justify-content: flex-end; }
+.vd-folha { width: 100%; max-height: 80%; overflow-y: auto; background: var(--bg-white); border-radius: 16px 16px 0 0; padding: .5rem 0 calc(.75rem + env(safe-area-inset-bottom)); box-shadow: var(--shadow-md); }
+.vd-folha h3 { margin: .75rem 1rem .25rem; font: 600 16px var(--font-body); }
+.vd-opcao { padding: .85rem 1rem; border-bottom: 1px solid var(--vd-linha); cursor: pointer; }
+.vd-opcao strong { display: block; font-weight: 600; font-size: 15px; }
+.vd-opcao small { color: var(--muted); font-size: 13px; }
+.vd-opcao.on strong { color: var(--silver-dark); }
+.vd-menu { margin: 56px .5rem 0 0; min-width: 230px; background: var(--bg-white); border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden; }
+.vd-menu .vd-opcao { border-bottom: 1px solid var(--border-light); font-size: 15px; }
+.vd-menu .vd-opcao.so-texto { cursor: default; color: var(--muted); font-size: 13px; }
+
+/* aviso temporário no rodapé (como o Snackbar do app) */
+.vd-aviso { position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom)); transform: translateX(-50%); max-width: min(92vw, 520px); z-index: 60; padding: .7rem 1rem; border-radius: 12px; background: #2b2c2f; color: #fff; font-size: 14px; box-shadow: var(--shadow-md); text-align: center; }
+.vd-aviso.erro { background: #8f1f1f; }
+
+@media (min-width: 721px) { body.vd-body { background: var(--silver-bg); } .vd-app { box-shadow: var(--shadow-md); } }
+@media print { .vd-topo, .vd-abas, .vd-fab, .vd-fab-solto { display: none !important; } }

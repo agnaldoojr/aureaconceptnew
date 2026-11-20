@@ -23,7 +23,7 @@ Todos os testes atuais são autônomos (SQLite em pasta temporária; nada de red
 | `internal/permissoes` | 21 módulos × 4 direitos, rótulos, `admin` sempre com tudo, 4 perfis prontos, **mapa rota → módulo → ação** idêntico ao `PermissaoInterceptor`, mensagens de negação | ~85 rotas reais conferidas (incluindo `salvar` com/sem código, agenda bloqueios/horários, financeiro, `/vendedor`, BI e lucratividade exigindo `VENDAS_TODOS`, barra final como o `split` do Java) |
 
 Itens da matriz atualizados na fatia 1: INF-02, INF-03 (`feito`); SEG-02, SEG-10, SEG-11, SEG-13 (`feito`, faltam integração/migração); e a regra pura de DOC-04, DOC-07, DOC-08, FIN-02, FIN-05, FIN-07, CAD-06, GES-03, SAL-02 (continuam `pendente` até a tela/rota existir e os testes I/G passarem).
-Nenhum item está `testado` ainda: falta o servidor.
+(Na fatia 3 os primeiros itens passaram a `testado`.)
 
 ### Fatia 2: configuração e admin inicial
 | Pacote | O que tem | Testes |
@@ -34,9 +34,24 @@ Nenhum item está `testado` ainda: falta o servidor.
 
 Itens da matriz: INF-04, INF-07 e SEG-03 `feito`; INF-05 segue `pendente` (a recusa de configuração insegura passa nos testes; faltam cookie, logs, shutdown e compressão, que dependem do servidor).
 
+### Fatia 3: servidor HTTP (login, sessão, CSRF, permissões, layout e estáticos)
+| Pacote / pasta | O que tem | Testes |
+|---|---|---|
+| `internal/web` (`servidor.go`) | Cadeia: cabeçalhos de segurança → estáticos e `/healthz` → `/login` e `/logout` → **sessão → login obrigatório → CSRF → permissão (`permissoes.Decidir`) → tela**. Login por formulário (`login`, `senha`, `modoApp`) com as mesmas mensagens do antigo, tempo de BCrypt gasto mesmo se o login não existe, **id de sessão novo a cada login**; uma sessão por usuário (a antiga vai a `/login?expired=true`); inativo não entra; negação volta ao `/dashboard` com mensagem de uma só leitura; `/bi` e lucratividade pedem `VENDAS_TODOS` | ver os 32 testes de integração do pacote (colunas ao lado) |
+| `internal/web/sessao.go` + `migrations/00002_sessoes.sql` | Sessões **no SQLite** (D-12), só o SHA-256 do id no banco; anônima de 30 min só para o token CSRF; renovação por inatividade; limpeza periódica | expira por inatividade (8 h) e renova; app instalado 30 dias com `Max-Age`; sobrevive a "reiniciar" (segundo `Servidor` no mesmo banco); limpeza apaga só as vencidas |
+| `internal/web/throttle.go` | Limite de login: 5 por IP+login, 30 por IP, bloqueio de 15 min, zera no sucesso, falha antiga recomeça a conta; IP do `X-Forwarded-For` atrás do Caddy | unitário com relógio manual + integração (5 erros bloqueiam até com a senha certa; 30 erros bloqueiam todos os logins do IP; IP forjado não escapa) |
+| `internal/web/estaticos.go` | `/css`, `/js`, `/img`, `/vendor` com hash no nome, 365 dias, ETag/304; `/favicon.ico` | toda URL das telas tem hash e responde 200/304; hash errado 404; tipos corretos (webp, woff2, json) |
+| `web/templates` (`layout/base.html`, `login.html`, `dashboard.html`) | Menu lateral por permissão (grupos Loja/Salão/Gerência), topo, rodapé e alertas, portados do Thymeleaf; **o dashboard ainda é provisório** | menu do admin completo, menu enxuto de quem só tem 2 módulos, mudança de permissão vale na hora |
+| `web/static` | CSS, JS, imagens e PWA do antigo **sem alteração**; `vendor/`: Font Awesome 6.5.0, Chart.js 4.4.1, Inter e Cormorant (D-04, com as licenças) | no navegador de verdade: login e dashboard com fonte, ícones e menu certos, **nenhuma requisição externa**, console sem erros |
+| `cmd/aurea` | `aurea` (config → banco → admin → servidor, desligamento gracioso, limpeza de sessões a cada 15 min) e `aurea healthcheck` | rodado de verdade (login e dashboard no Edge); **RAM medida: 68 MB de memória residente no Windows** com login feito (o Java do antigo fica em ~330–380 MB); número de Linux/Docker só na hora de medir o contêiner |
+
+Itens da matriz: `testado` INF-08, SEG-04, SEG-05, SEG-06, SEG-07, SEG-10, SEG-11; `feito` INF-05, INF-06, SEG-08, SEG-09, SEG-12, UI-01, UI-02, UI-03, UI-06 (faltam E2E, o 429 da API e o `/api`).
+**Não testado ainda:** E2E Playwright e comparação visual automática (só vi o login no navegador e ele bate com a captura de referência), `/api` e `/vendedor/api`, celular real, Docker.
+**Correção:** na fatia 2 eu tinha criado uma "janela de 30 min" no limite de login; o antigo não tem isso (são 5 por IP+login, **30 por IP** e 15 min de bloqueio). Corrigido: `LOGIN_TENTATIVAS_IP=30`, sem `LOGIN_JANELA_MIN`.
+
 ## Próximas fatias (ordem proposta)
 1. ~~Configuração por variáveis de ambiente e admin inicial~~ (feito na fatia 2).
-2. **Servidor HTTP**: sessão única persistida no SQLite (D-12), CSRF, limite de login, middleware de permissão (usa `internal/permissoes`), layout base e estáticos copiados do antigo com hash no nome (INF-08, UI-01/02/06).
+2. ~~Servidor HTTP: sessão, CSRF, limite de login, permissões, layout e estáticos~~ (feito na fatia 3; falta o conteúdo do dashboard).
 3. **Cadastros** (produtos com unidades e serviços, unidades, pessoas, usuários, permissões) + testes de integração e E2E.
 4. **Documentos + estoque + financeiro** (o núcleo transacional) com os testes *golden* (`e2e/semear.mjs` nos dois sistemas).
 5. **API `/api` e `/vendedor/api`** contra `docs/referencia/api/contrato.json`.

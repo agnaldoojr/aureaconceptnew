@@ -3,7 +3,7 @@
 Migração do sistema de gestão **Áurea Concept** (loja de roupa + salão + gerência + app Android) de Java/Spring Boot/SQL Server para uma stack leve
 (**Go + SQLite**), mantendo o **design** e **todas as funcionalidades**, para rodar em uma VPS pequena (meta: **≤ 512 MB de RAM no total**, app + proxy).
 
-> **Estado atual: Fase 1 (análise) concluída e aprovada; Fase 2 (implementação) em andamento.** O alicerce (regras de dinheiro, banco SQLite com migrations, BCrypt, permissões, configuração por variáveis de ambiente e admin inicial) está pronto e testado contra valores gerados pelo sistema Java; **ainda não há servidor HTTP**. Veja [docs/PROGRESSO.md](docs/PROGRESSO.md).
+> **Estado atual: Fase 1 (análise) concluída e aprovada; Fase 2 (implementação) em andamento.** O alicerce (regras de dinheiro, banco SQLite com migrations, BCrypt, permissões, configuração por variáveis de ambiente e admin inicial) está pronto e testado contra valores gerados pelo sistema Java; o servidor HTTP já sobe com login, sessão, CSRF, permissões e o layout base (`go run ./cmd/aurea`), mas ainda sem as telas de negócio. Veja [docs/PROGRESSO.md](docs/PROGRESSO.md).
 
 ## Documentação (comece por aqui)
 | Arquivo | Conteúdo |

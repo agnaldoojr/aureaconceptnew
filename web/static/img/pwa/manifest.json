@@ -1,0 +1,18 @@
+{
+  "id": "/",
+  "name": "Áurea Concept",
+  "short_name": "Áurea",
+  "description": "Sistema de gestão da loja, do salão e da gerência.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f5f3",
+  "theme_color": "#f0f0ed",
+  "icons": [
+    { "src": "/img/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/img/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

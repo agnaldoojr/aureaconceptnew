@@ -19,8 +19,8 @@ func TestPadroesDeDesenvolvimento(t *testing.T) {
 	if c.SessaoWeb != 8*time.Hour || c.SessaoApp != 30*24*time.Hour {
 		t.Errorf("sessões: %v %v", c.SessaoWeb, c.SessaoApp)
 	}
-	if c.LoginTentativas != 5 || c.LoginJanela != 30*time.Minute || c.LoginBloqueio != 15*time.Minute {
-		t.Errorf("limites de login: %d %v %v", c.LoginTentativas, c.LoginJanela, c.LoginBloqueio)
+	if c.LoginTentativas != 5 || c.LoginTentativasIP != 30 || c.LoginBloqueio != 15*time.Minute {
+		t.Errorf("limites de login: %d %v %v", c.LoginTentativas, c.LoginTentativasIP, c.LoginBloqueio)
 	}
 	if c.BackupRetencao != 30 || c.BackupHorario != "03:00" || c.BackupRemoto != "" {
 		t.Errorf("backup: %+v", c)
@@ -74,13 +74,13 @@ func TestErrosSaoReunidos(t *testing.T) {
 func TestValoresPersonalizados(t *testing.T) {
 	c, err := Carregar(env(map[string]string{
 		"PORT": "9090", "BIND": "127.0.0.1", "DB_PATH": "/dados/a.db", "SESSION_TIMEOUT_HORAS": "2", "SESSION_APP_DIAS": "10",
-		"LOGIN_TENTATIVAS": "3", "LOGIN_JANELA_MIN": "10", "LOGIN_BLOQUEIO_MIN": "20", "BACKUP_REMOTO": "gdrive:x", "BACKUP_RETENCAO_DIAS": "7", "BACKUP_HORARIO": "04:30",
+		"LOGIN_TENTATIVAS": "3", "LOGIN_TENTATIVAS_IP": "10", "LOGIN_BLOQUEIO_MIN": "20", "BACKUP_REMOTO": "gdrive:x", "BACKUP_RETENCAO_DIAS": "7", "BACKUP_HORARIO": "04:30",
 	}))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if c.Endereco != "127.0.0.1:9090" || c.CaminhoBanco != "/dados/a.db" || c.SessaoWeb != 2*time.Hour || c.SessaoApp != 240*time.Hour ||
-		c.LoginTentativas != 3 || c.LoginJanela != 10*time.Minute || c.LoginBloqueio != 20*time.Minute ||
+		c.LoginTentativas != 3 || c.LoginTentativasIP != 10 || c.LoginBloqueio != 20*time.Minute ||
 		c.BackupRemoto != "gdrive:x" || c.BackupRetencao != 7 || c.BackupHorario != "04:30" {
 		t.Errorf("valores: %+v", c)
 	}

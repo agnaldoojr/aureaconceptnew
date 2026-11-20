@@ -27,8 +27,8 @@ func contar(t *testing.T, b *Banco, consulta string, args ...any) int {
 
 func TestMigrationsCriamAs25Tabelas(t *testing.T) {
 	b := abrirTemporario(t)
-	n := contar(t, b, `SELECT count(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name <> 'goose_db_version'`)
-	if n != 25 { // as 25 tabelas de negócio do SQL Server (Script_Aplicado era só controle do db-init; aqui é a goose_db_version)
+	n := contar(t, b, `SELECT count(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT IN ('goose_db_version','Sessao_Web')`)
+	if n != 25 { // as 25 tabelas de negócio do SQL Server; goose_db_version e Sessao_Web (sessões do sistema novo, D-12) ficam de fora
 		t.Errorf("tabelas de negócio = %d, esperado 25", n)
 	}
 	for _, tabela := range []string{"Pessoas", "Usuarios", "Direito_Usuario", "Token_App", "Produto", "Estoque", "Produto_Unidade", "Unidade_Medida",

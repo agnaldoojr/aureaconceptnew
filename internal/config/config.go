@@ -25,9 +25,13 @@ type Config struct {
 	SessaoWeb    time.Duration // SESSION_TIMEOUT: duração da sessão do navegador (padrão 8h)
 	SessaoApp    time.Duration // SESSION_APP_DIAS: duração da sessão do aplicativo (padrão 30 dias)
 
-	LoginTentativas int           // LOGIN_TENTATIVAS: falhas seguidas até bloquear (padrão 5)
-	LoginJanela     time.Duration // LOGIN_JANELA_MIN: período em que as falhas são contadas (padrão 30 min)
-	LoginBloqueio   time.Duration // LOGIN_BLOQUEIO_MIN: tempo de bloqueio (padrão 15 min)
+	LoginTentativas   int           // LOGIN_TENTATIVAS: falhas seguidas do mesmo IP com o mesmo login até bloquear (padrão 5)
+	LoginTentativasIP int           // LOGIN_TENTATIVAS_IP: falhas seguidas do mesmo IP, com qualquer login, até bloquear (padrão 30)
+	LoginBloqueio     time.Duration // LOGIN_BLOQUEIO_MIN: tempo de bloqueio (padrão 15 min)
+
+	// ProxyConfiavel: PROXY_CONFIAVEL. true = o IP do cliente vem do último valor de X-Forwarded-For (o Caddy da frente grava ali).
+	// Padrão true em prod (o contêiner do app só é alcançável pelo Caddy) e false em dev. Com false, vale o IP da conexão.
+	ProxyConfiavel bool
 
 	Fuso     string         // FUSO (padrão America/Sao_Paulo)
 	Local    *time.Location // fuso carregado
@@ -115,8 +119,10 @@ func Carregar(getenv func(string) string) (*Config, error) {
 	c.SessaoApp = time.Duration(dias) * 24 * time.Hour
 
 	c.LoginTentativas = inteiro("LOGIN_TENTATIVAS", 5, 1, 100)
-	c.LoginJanela = time.Duration(inteiro("LOGIN_JANELA_MIN", 30, 1, 24*60)) * time.Minute
+	c.LoginTentativasIP = inteiro("LOGIN_TENTATIVAS_IP", 30, 1, 10000)
 	c.LoginBloqueio = time.Duration(inteiro("LOGIN_BLOQUEIO_MIN", 15, 1, 24*60)) * time.Minute
+
+	c.ProxyConfiavel = booleano("PROXY_CONFIAVEL", prod)
 
 	c.Fuso = txt("FUSO", "America/Sao_Paulo")
 	loc, err := time.LoadLocation(c.Fuso)

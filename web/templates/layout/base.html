@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{{.Titulo}} — Áurea Concept</title>
+    <link rel="icon" type="image/webp" href="{{asset "/img/logo-aurea.webp"}}"/>
+    <!-- App instalável (iPhone: Compartilhar > Adicionar à Tela de Início). Sem service worker de propósito: nada de dado velho em cache. -->
+    <link rel="manifest" href="{{asset "/img/pwa/manifest.json"}}"/>
+    <link rel="apple-touch-icon" href="{{asset "/img/pwa/apple-touch-icon.png"}}"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-title" content="Áurea"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+    {{if .EntradaVendedor}}<!-- só na tela inicial de quem é vendedor: o app instalado abre o Modo vendedor (ver tema-init.js) -->
+    <meta name="aurea-entrada" content="vendedor"/>{{end}}
+    <!-- aplica o tema salvo (claro/escuro, destaque, densidade) antes de pintar, sem "piscar" -->
+    <script src="{{asset "/js/tema-init.js"}}"></script>
+    <!-- fontes e ícones servidos pelo próprio sistema (nada de CDN) -->
+    <link rel="stylesheet" href="{{asset "/vendor/fonts/fonts.css"}}"/>
+    <link rel="stylesheet" href="{{asset "/css/style.css"}}"/>
+    <link rel="stylesheet" href="{{asset "/vendor/fontawesome/css/all.min.css"}}"/>
+    {{block "cabeca" .}}{{end}}
+</head>
+<body>
+
+<!-- ═══════════════════════  SIDEBAR  ═══════════════════════ -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <a href="/dashboard" title="Áurea Concept — Beauty | Nails | Care">
+            <img class="sidebar-logo-img" src="{{asset "/img/logo-aurea.webp"}}" alt="Áurea Concept — Beauty | Nails | Care"/>
+        </a>
+    </div>
+
+    <ul class="sidebar-menu">
+        <li{{if eq .PaginaAtiva "dashboard"}} class="active"{{end}}>
+            <a href="/dashboard">
+                <i class="fas fa-chart-line"></i><span>Dashboard</span>
+            </a>
+        </li>
+        {{if pode .Auth "APP_VENDAS_CONSULTA"}}<!-- telas de celular com o fluxo do aplicativo de vendas (quem tem o acesso ao app) -->
+        <li>
+            <a href="/vendedor">
+                <i class="fas fa-mobile-screen-button"></i><span>Modo vendedor</span>
+            </a>
+        </li>{{end}}
+        {{if podeAlgum .Auth "PRODUTOS_CONSULTA" "UNIDADES_CONSULTA" "PESSOAS_CONSULTA" "DOCUMENTOS_CONSULTA" "ESTOQUE_CONSULTA"}}<!-- Grupo da loja: o título só aparece se o usuário enxerga alguma tela dele -->
+        <li class="sidebar-section">
+            Loja de roupa
+        </li>{{end}}
+        {{if pode .Auth "PRODUTOS_CONSULTA"}}<li{{if eq .PaginaAtiva "produtos"}} class="active"{{end}}>
+            <a href="/produtos">
+                <i class="fas fa-gem"></i><span>Produtos</span>
+            </a>
+        </li>{{end}}
+        {{if pode .Auth "UNIDADES_CONSULTA"}}<li{{if eq .PaginaAtiva "unidades"}} class="active"{{end}}>
+            <a href="/unidades">
+                <i class="fas fa-ruler"></i><span>Unidades</span>
+            </a>
+        </li>{{end}}
+        {{if pode .Auth "PESSOAS_CONSULTA"}}<li{{if eq .PaginaAtiva "pessoas"}} class="active"{{end}}>
+            <a href="/pessoas">
+                <i class="fas fa-users"></i><span>Pessoas</span>
+            </a>
+        </li>{{end}}
+        {{if pode .Auth "DOCUMENTOS_CONSULTA"}}<li{{if eq .PaginaAtiva "documentos"}} class="active"{{end}}>
+            <a href="/documentos">
+                <i class="fas fa-file-invoice"></i><span>Documentos</span>
+            </a>
+        </li>{{end}}
+        {{if pode .Auth "ESTOQUE_CONSULTA"}}<li{{if eq .PaginaAtiva "estoque"}} class="active"{{end}}>
+            <a href="/estoque">
+                <i class="fas fa-boxes-stacked"></i><span>Estoque</span>
+            </a>
+        </li>{{end}}
+        {{if podeAlgum .Auth "COMISSOES_CONSULTA" "AGENDA_CONSULTA"}}<!-- Grupo do salão: aparece para quem acompanha comissões (profissionais e gerência) -->
+        <li class="sidebar-section">
+            Salão
+        </li>{{end}}
+        {{if pode .Auth "AGENDA_CONSULTA"}}<li{{if eq .PaginaAtiva "agenda"}} class="active"{{end}}>
+            <a href="/agenda">
+                <i class="fas fa-calendar-days"></i><span>Agenda</span>
+            </a>
+        </li>{{end}}
+        {{if and (podeAlgum .Auth "COMISSOES_CONSULTA" "AGENDA_CONSULTA") (pode .Auth "PRODUTOS_CONSULTA")}}<li>
+            <a href="/produtos?tipo=servico">
+                <i class="fas fa-scissors"></i><span>Serviços</span>
+            </a>
+        </li>{{end}}
+        {{if and (pode .Auth "COMISSOES_CONSULTA") (pode .Auth "DOCUMENTOS_INCLUSAO")}}<li>
+            <a href="/documentos/novo">
+                <i class="fas fa-spa"></i><span>Novo atendimento</span>
+            </a>
+        </li>{{end}}
+        {{if pode .Auth "COMISSOES_CONSULTA"}}<li{{if eq .PaginaAtiva "comissoes"}} class="active"{{end}}>
+            <a href="/comissoes">
+                <i class="fas fa-percent"></i><span>Comissões</span>
+            </a>
+        </li>{{end}}
+        {{if podeAlgum .Auth "RELATORIOS_CONSULTA" "BI_EXECUTIVO_CONSULTA" "BI_INSIGHTS_CONSULTA" "FIN_TITULOS_CONSULTA" "FIN_CONTAS_CONSULTA" "FIN_FLUXO_CONSULTA" "FIN_DRE_CONSULTA" "FIN_CADASTROS_CONSULTA" "USUARIOS_CONSULTA" "METAS_CONSULTA"}}<!-- Grupo da gerência -->
+        <li class="sidebar-section">
+            Gerência
+        </li>{{end}}
+        {{if pode .Auth "METAS_CONSULTA"}}<li{{if eq .PaginaAtiva "metas"}} class="active"{{end}}>
+            <a href="/metas">
+                <i class="fas fa-bullseye"></i><span>Metas</span>
+            </a>
+        </li>{{end}}
+        {{if pode .Auth "RELATORIOS_CONSULTA"}}<li{{if eq .PaginaAtiva "relatorios"}} class="active"{{end}}>
+            <a href="/relatorios">
+                <i class="fas fa-chart-bar"></i><span>Relatórios</span>
+            </a>
+        </li>{{end}}
+        {{if podeAlgum .Auth "BI_EXECUTIVO_CONSULTA" "BI_INSIGHTS_CONSULTA"}}<li{{if eq .PaginaAtiva "bi"}} class="active"{{end}}>
+            <a href="/bi">
+                <i class="fas fa-chart-pie"></i><span>BI</span>
+            </a>
+        </li>{{end}}
+        {{if podeAlgum .Auth "FIN_TITULOS_CONSULTA" "FIN_CONTAS_CONSULTA" "FIN_FLUXO_CONSULTA" "FIN_DRE_CONSULTA" "FIN_CADASTROS_CONSULTA"}}<li{{if eq .PaginaAtiva "financeiro"}} class="active"{{end}}>
+            <a href="/financeiro">
+                <i class="fas fa-coins"></i><span>Financeiro</span>
+            </a>
+        </li>{{end}}
+        {{if pode .Auth "USUARIOS_CONSULTA"}}<li{{if eq .PaginaAtiva "usuarios"}} class="active"{{end}}>
+            <a href="/usuarios">
+                <i class="fas fa-user-shield"></i><span>Usuários</span>
+            </a>
+        </li>{{end}}
+    </ul>
+
+    <div class="sidebar-footer">
+        <span class="sidebar-version">v1.0.0</span>
+        <span class="sidebar-hint"><kbd>Ctrl</kbd> <kbd>K</kbd> busca</span>
+    </div>
+</nav>
+<div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<!-- ═══════════════════════  MAIN  ═══════════════════════ -->
+<div class="main-wrapper">
+
+    <!-- HEADER -->
+    <header class="top-bar">
+        <button type="button" class="icon-btn sidebar-toggle" onclick="toggleSidebar()"
+                aria-label="Abrir ou recolher o menu" title="Abrir ou recolher o menu">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="page-breadcrumb">
+            <span class="crumb-root">Áurea Concept</span>
+            <i class="fas fa-chevron-right crumb-sep"></i>
+            <span class="crumb-current">{{.Titulo}}</span>
+        </div>
+
+        <div class="top-bar-right">
+            <button type="button" class="search-trigger" onclick="abrirPaleta()" aria-label="Buscar telas e ações (Ctrl+K)">
+                <i class="fas fa-magnifying-glass"></i>
+                <span class="st-text">Buscar telas e ações…</span>
+                <kbd>Ctrl K</kbd>
+            </button>
+
+            <button type="button" class="icon-btn" id="btnTema" onclick="alternarTema()"
+                    aria-label="Alternar tema claro e escuro" title="Alternar tema claro e escuro">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <div class="user-menu" id="userMenu">
+                <button type="button" class="user-trigger" onclick="alternarUserMenu(event)"
+                        aria-haspopup="true" aria-expanded="false">
+                    <span class="user-avatar"><span class="js-iniciais">?</span></span>
+                    <span class="user-name">{{.Usuario}}</span>
+                    <i class="fas fa-chevron-down user-caret"></i>
+                </button>
+
+                <div class="user-dropdown" hidden="hidden">
+                    <div class="ud-head">
+                        <span class="user-avatar big"><span class="js-iniciais">?</span></span>
+                        <div>
+                            <strong>{{.Usuario}}</strong>
+                            <small>Sessão ativa</small>
+                        </div>
+                    </div>
+
+                    <div class="ud-group">
+                        <span class="ud-label">Tema</span>
+                        <div class="seg" data-pref="theme">
+                            <button type="button" data-valor="light"><i class="fas fa-sun"></i> Claro</button>
+                            <button type="button" data-valor="dark"><i class="fas fa-moon"></i> Escuro</button>
+                            <button type="button" data-valor="system"><i class="fas fa-circle-half-stroke"></i> Auto</button>
+                        </div>
+                    </div>
+
+                    <div class="ud-group">
+                        <span class="ud-label">Cor de destaque</span>
+                        <div class="swatches" data-pref="accent">
+                            <button type="button" data-valor="prata" style="--sw:#8a8d92" title="Prata" aria-label="Prata"></button>
+                            <button type="button" data-valor="azul"  style="--sw:#4672ad" title="Azul" aria-label="Azul"></button>
+                            <button type="button" data-valor="verde" style="--sw:#2b837c" title="Verde-água" aria-label="Verde-água"></button>
+                            <button type="button" data-valor="rosa"  style="--sw:#a4506b" title="Rosa" aria-label="Rosa"></button>
+                        </div>
+                    </div>
+
+                    <div class="ud-group">
+                        <span class="ud-label">Densidade</span>
+                        <div class="seg" data-pref="density">
+                            <button type="button" data-valor="compact">Compacta</button>
+                            <button type="button" data-valor="comfortable">Confortável</button>
+                            <button type="button" data-valor="spacious">Espaçosa</button>
+                        </div>
+                    </div>
+
+                    <!-- só aparece no iPhone/iPad, no navegador (ainda não instalado) -->
+                    <div class="ud-group" id="dicaInstalar" hidden="hidden">
+                        <span class="ud-label">Instalar no iPhone</span>
+                        <p class="ud-dica">
+                            No Safari, toque em <i class="fas fa-arrow-up-from-bracket"></i> <strong>Compartilhar</strong>
+                            e depois em <strong>Adicionar à Tela de Início</strong>.
+                        </p>
+                    </div>
+
+                    <a class="ud-logout" href="/logout"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content-area">
+
+        <!-- Mensagens de feedback -->
+        {{if .Sucesso}}<div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span>{{.Sucesso}}</span>
+        </div>{{end}}
+        {{if .Erro}}<div class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{.Erro}}</span>
+        </div>{{end}}
+        {{if .Info}}<div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <span>{{.Info}}</span>
+        </div>{{end}}
+
+        <!-- Conteúdo da página -->
+        {{template "conteudo" .}}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <span>◆ Áurea Concept — Beauty | Nails | Care</span>
+        <span>{{.Ano}}</span>
+    </footer>
+</div>
+
+<!-- Paleta de comandos (Ctrl+K): telas do menu + ações de aparência -->
+<div class="palette" id="paleta" hidden="hidden">
+    <div class="palette-backdrop" onclick="fecharPaleta()"></div>
+    <div class="palette-box" role="dialog" aria-modal="true" aria-label="Buscar telas e ações">
+        <div class="palette-input">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="text" id="paletaBusca" placeholder="Buscar telas e ações…" autocomplete="off"
+                   spellcheck="false" aria-label="Buscar telas e ações"/>
+            <kbd>Esc</kbd>
+        </div>
+        <ul class="palette-list" id="paletaLista" role="listbox"></ul>
+        <div class="palette-foot">
+            <span><kbd>↑</kbd><kbd>↓</kbd> navegar</span>
+            <span><kbd>Enter</kbd> abrir</span>
+        </div>
+    </div>
+</div>
+
+<script src="{{asset "/js/main.js"}}"></script>
+{{block "scripts" .}}{{end}}
+</body>
+</html>

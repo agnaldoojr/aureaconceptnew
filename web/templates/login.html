@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Acesso — Áurea Concept</title>
+    <link rel="icon" type="image/webp" href="{{asset "/img/logo-aurea.webp"}}"/>
+    <!-- App instalável (iPhone: Compartilhar > Adicionar à Tela de Início). Sem service worker de propósito: nada de dado velho em cache. -->
+    <link rel="manifest" href="{{asset "/img/pwa/manifest.json"}}"/>
+    <link rel="apple-touch-icon" href="{{asset "/img/pwa/apple-touch-icon.png"}}"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-title" content="Áurea"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+    <script src="{{asset "/js/tema-init.js"}}"></script>
+    <!-- fontes e ícones servidos pelo próprio sistema (nada de CDN) -->
+    <link rel="stylesheet" href="{{asset "/vendor/fonts/fonts.css"}}"/>
+    <link rel="stylesheet" href="{{asset "/vendor/fontawesome/css/all.min.css"}}"/>
+    <link rel="stylesheet" href="{{asset "/css/style.css"}}"/>
+</head>
+<body class="login-body">
+
+<div class="login-container">
+
+    <!-- Painel esquerdo — decorativo -->
+    <div class="login-brand">
+        <div class="brand-content">
+            <h1 class="sr-only" style="position:absolute;left:-9999px">Áurea Concept</h1>
+            <img class="brand-logo" src="{{asset "/img/logo-aurea.webp"}}" alt="Áurea Concept — Beauty | Nails | Care"/>
+            <p class="brand-tagline">Elegância em cada detalhe</p>
+            <div class="brand-divider"></div>
+            <p class="brand-desc">Sistema de gestão para a loja, o salão e a gerência, tudo na mesma plataforma.</p>
+        </div>
+        <div class="brand-orbs">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+    </div>
+
+    <!-- Painel direito — formulário -->
+    <div class="login-form-panel">
+        <div class="login-form-content">
+
+            <div class="login-header">
+                <img class="login-logo-mobile" src="{{asset "/img/logo-aurea.webp"}}" alt="Áurea Concept"/>
+                <span class="login-gem-icon">◆</span>
+                <h3 class="login-title">Bem-vindo</h3>
+                <p class="login-subtitle">Acesso restrito ao sistema</p>
+            </div>
+
+            <!-- Alertas de erro/sucesso -->
+            {{if .Erro}}<div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{.Erro}}</span>
+            </div>{{end}}
+            {{if .Info}}<div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <span>{{.Info}}</span>
+            </div>{{end}}
+
+            <form action="/login" method="post" class="login-form">
+                <input type="hidden" name="_csrf" value="{{.CSRF}}"/>
+                <!-- 1 só quando o login é feito no app instalado na tela de início; o servidor então mantém a sessão por mais dias -->
+                <input type="hidden" name="modoApp" id="modoApp" value="0"/>
+
+                <div class="form-group">
+                    <label for="login" class="form-label">
+                        <i class="fas fa-user"></i> Usuário
+                    </label>
+                    <input type="text" id="login" name="login"
+                           class="form-control" placeholder="Digite seu login"
+                           required autofocus autocomplete="username"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha" class="form-label">
+                        <i class="fas fa-lock"></i> Senha
+                    </label>
+                    <div class="input-icon-right">
+                        <input type="password" id="senha" name="senha"
+                               class="form-control" placeholder="Digite sua senha"
+                               required autocomplete="current-password"/>
+                        <button type="button" class="btn-eye" onclick="toggleSenha('senha', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Entrar
+                </button>
+            </form>
+
+            <div class="login-footer-note">
+                <i class="fas fa-shield-halved"></i>
+                Este sistema é de uso exclusivo de colaboradores autorizados.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // app instalado (iPhone: navigator.standalone; demais: display-mode standalone) => modoApp=1
+    (function () {
+        var instalado = window.navigator.standalone === true ||
+            (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+        var campo = document.getElementById('modoApp');
+        if (campo && instalado) campo.value = '1';
+    })();
+
+    function toggleSenha(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+</script>
+</body>
+</html>
