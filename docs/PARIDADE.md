@@ -15,10 +15,10 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 | INF-01 | Binário único Go (net/http/chi), `html/template`, sem CGO, arquivos estáticos e templates embutidos | meta ≤ 512 MB | I, S | pendente |
 | INF-02 | SQLite via `modernc.org/sqlite`: WAL, `busy_timeout`, `foreign_keys=ON`, **uma conexão de escrita**, transações em documento/estoque/financeiro | RN-DOC-06 | I | feito (I ✔) |
 | INF-03 | Migrations versionadas embutidas (convertendo `schema.sql` + `02`–`13`), controle de versão, rodam no boot; script destrutivo nunca roda sozinho | §4 | I | feito (I ✔) |
-| INF-04 | Configuração 100 % por variáveis de ambiente + `.env.example` comentado (PORT, DB_PATH, DOMINIO, COOKIE_SECURE, perfil prod, limites de login, backup GDRIVE_*, retenção, horário, admin inicial) | §3 | I | pendente |
-| INF-05 | Perfil `prod`: cookie seguro, logs enxutos, recusa configuração insegura (sem senha padrão), shutdown gracioso, compressão | `application-prod.properties` | I | pendente |
+| INF-04 | Configuração 100 % por variáveis de ambiente + `.env.example` comentado (PORT, DB_PATH, DOMINIO, COOKIE_SECURE, perfil prod, limites de login, backup GDRIVE_*, retenção, horário, admin inicial) | §3 | I | feito (U ✔ `internal/config` + `.env.example`; falta ligar ao `main`) |
+| INF-05 | Perfil `prod`: cookie seguro, logs enxutos, recusa configuração insegura (sem senha padrão), shutdown gracioso, compressão | `application-prod.properties` | I | pendente (recusa de config insegura U ✔; faltam cookie, logs, shutdown e compressão no servidor) |
 | INF-06 | Healthcheck HTTP (`/login` 200 ou `/healthz`) e `HEALTHCHECK` no Docker | Dockerfile | S | pendente |
-| INF-07 | Fuso `America/Sao_Paulo` (tzdata embutido) para "hoje", "mês atual", DRE e metas | §8-5 | U, I | pendente |
+| INF-07 | Fuso `America/Sao_Paulo` (tzdata embutido) para "hoje", "mês atual", DRE e metas | §8-5 | U, I | feito (U ✔ fuso embutido; falta aplicar nas telas) |
 | INF-08 | Estáticos com URL versionada por hash do conteúdo e cache de 365 dias em `prod` | §8-8 | I | pendente |
 | INF-09 | Página de erro 404/500 simples em português mantendo o status HTTP ⚠ D-11 | screenshot `rota-inexistente` | E | pendente |
 | INF-10 | Dockerfile multi-stage, imagem final mínima, usuário não-root | `Dockerfile` | S | pendente |
@@ -33,7 +33,7 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 |---|---|---|---|---|
 | SEG-01 | Login por formulário (`login`, `senha`), logout, redirecionamentos e mensagens de `/login` (erro, logout, expirada, bloqueado) | §1, §3 | I, E | pendente |
 | SEG-02 | **Hashes BCrypt existentes continuam válidos** (`$2a$10$…`); novos hashes BCrypt fator 10 | RN-SEG-01 | U, I, M | feito (U ✔ com hashes reais do Java; faltam I, M) |
-| SEG-03 | Sem senha padrão em produção: admin inicial por variável/primeiro boot ⚠ D-01 | pedido | I | pendente |
+| SEG-03 | Sem senha padrão em produção: admin inicial por variável/primeiro boot ⚠ D-01 | pedido | I | feito (I ✔ com SQLite real: cria, recusa sem senha, recusa senha fraca, recusa hash do `Admin@123`; falta teste do boot completo) |
 | SEG-04 | Usuário inativo não entra | RN-USR | I | pendente |
 | SEG-05 | **Sessão única por usuário** (novo login expira a antiga → `/login?expired=true`), sessões em memória, uma instância ⚠ D-12 | §3 | I | pendente |
 | SEG-06 | Sessão web 8 h; **app instalado** (`modoApp=1`) 30 dias sem uso com cookie persistente (`SESSAO_APP_DIAS`, 0 desliga) | `SessaoApp` | I | pendente |

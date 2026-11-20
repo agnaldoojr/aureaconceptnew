@@ -11,8 +11,10 @@ go test ./... -count=1
 ```
 Todos os testes atuais são autônomos (SQLite em pasta temporária; nada de rede nem de SQL Server). Os arquivos *golden* vêm do sistema antigo e estão versionados em `testdata/golden/`.
 
-## Pronto e testado (fatia 1: alicerce)
-| Pacote | O que tem | Testes (25 passando) |
+## Pronto e testado (fatias 1 e 2)
+
+### Fatia 1: alicerce
+| Pacote | O que tem | Testes |
 |---|---|---|
 | `internal/dominio` | Regras puras com decimais exatos (`shopspring/decimal`): quantidade e valor na unidade base, **custo médio ponderado**, total do item e do documento, **parcelas** (ROUND_DOWN + resto), taxa de cartão, comissão, preço sugerido, valor movimentado, status do título, progresso da meta | **1.212 casos gerados pelo Java do sistema antigo** (`tools/golden/Golden.java` → `testdata/golden/dinheiro.csv`) conferem com o Go + casos de borda (fator 0, arredondamento do documento D-05, exemplo da caixa do README, barra da meta; o dashboard de referência dá 19 % e falta R$ 8.024,50) |
 | `internal/db` | Abertura do SQLite (`modernc.org/sqlite`, sem CGO): WAL, `busy_timeout`, `foreign_keys`, **uma conexão de escrita**, pool de leitura somente leitura, collation `AUREA_CIAI` (sem maiúscula e sem acento, como o `Latin1_General_CI_AI`) e função `aurea_norm`; migrations goose embutidas rodando na abertura | 25 tabelas criadas, migration idempotente, dados iniciais iguais ao antigo (2 segmentos, 5 unidades, 9 tipos, 3 contas, 12 categorias, 9 formas com taxa/parcelas), pragmas, escrita bloqueada no pool de leitura, FK barra órfãos, **login único sem diferenciar `João`/`JOAO`/`joão  `**, busca sem acento, 13 restrições do esquema (CHECKs) e a regra D-07 da meta |
@@ -20,11 +22,20 @@ Todos os testes atuais são autônomos (SQLite em pasta temporária; nada de red
 | `internal/auth` | BCrypt fator 10 | **hashes reais gerados pelo Java** (admin e 4 usuários do banco de referência) continuam válidos; hash novo é `$2a$10$`/`$2b$10$`; senha errada ou vazia nunca confere |
 | `internal/permissoes` | 21 módulos × 4 direitos, rótulos, `admin` sempre com tudo, 4 perfis prontos, **mapa rota → módulo → ação** idêntico ao `PermissaoInterceptor`, mensagens de negação | ~85 rotas reais conferidas (incluindo `salvar` com/sem código, agenda bloqueios/horários, financeiro, `/vendedor`, BI e lucratividade exigindo `VENDAS_TODOS`, barra final como o `split` do Java) |
 
-Itens da matriz atualizados: INF-02, INF-03 (`feito`); SEG-02, SEG-10, SEG-11, SEG-13 (`feito`, faltam integração/migração); e a regra pura de DOC-04, DOC-07, DOC-08, FIN-02, FIN-05, FIN-07, CAD-06, GES-03, SAL-02 (continuam `pendente` até a tela/rota existir e os testes I/G passarem).
+Itens da matriz atualizados na fatia 1: INF-02, INF-03 (`feito`); SEG-02, SEG-10, SEG-11, SEG-13 (`feito`, faltam integração/migração); e a regra pura de DOC-04, DOC-07, DOC-08, FIN-02, FIN-05, FIN-07, CAD-06, GES-03, SAL-02 (continuam `pendente` até a tela/rota existir e os testes I/G passarem).
 Nenhum item está `testado` ainda: falta o servidor.
 
+### Fatia 2: configuração e admin inicial
+| Pacote | O que tem | Testes |
+|---|---|---|
+| `internal/config` | Configuração só por variáveis de ambiente (`APP_ENV`, `PORT`, `BIND`, `DB_PATH`, `DOMINIO`, `COOKIE_SECURE`, sessões, limites de login, `FUSO`, logs, `ADMIN_SENHA_INICIAL`, backup). **Reúne todos os erros de uma vez**; em `prod` exige `DOMINIO` e liga cookie seguro e log JSON por padrão; fuso `America/Sao_Paulo` **embutido no binário** (`time/tzdata`); senha inicial validada (10+ caracteres, maiúscula, minúscula, número, fora de uma lista de senhas conhecidas, até 72 bytes por causa do BCrypt) | padrões de dev, fuso (12:00 UTC = 09:00 em São Paulo), prod sem domínio recusa, `COOKIE_SECURE=false` explícito vale, 7 erros reunidos numa só mensagem, valores personalizados, 6 senhas ruins recusadas |
+| `internal/bootstrap` | `GarantirAdmin`: sem `admin`, cria (nome Administrador, hash BCrypt, 21 módulos com tudo marcado) a partir de `ADMIN_SENHA_INICIAL`; com `admin`, **nunca altera a senha** e dispensa a variável; recusa o hash do `Admin@123` do sistema antigo | SQLite real: cria e o login casa sem diferenciar maiúscula; sem senha recusa e não cria nada; senha fraca ou `Admin@123` recusadas; segundo boot não troca a senha; hash do `schema.sql` antigo recusado |
+| `.env.example` | Modelo comentado de todas as variáveis | — |
+
+Itens da matriz: INF-04, INF-07 e SEG-03 `feito`; INF-05 segue `pendente` (a recusa de configuração insegura passa nos testes; faltam cookie, logs, shutdown e compressão, que dependem do servidor).
+
 ## Próximas fatias (ordem proposta)
-1. **Configuração por variáveis de ambiente** (`internal/config`) e admin inicial por `ADMIN_SENHA_INICIAL` (SEG-03, INF-04/05).
+1. ~~Configuração por variáveis de ambiente e admin inicial~~ (feito na fatia 2).
 2. **Servidor HTTP**: sessão única persistida no SQLite (D-12), CSRF, limite de login, middleware de permissão (usa `internal/permissoes`), layout base e estáticos copiados do antigo com hash no nome (INF-08, UI-01/02/06).
 3. **Cadastros** (produtos com unidades e serviços, unidades, pessoas, usuários, permissões) + testes de integração e E2E.
 4. **Documentos + estoque + financeiro** (o núcleo transacional) com os testes *golden* (`e2e/semear.mjs` nos dois sistemas).
