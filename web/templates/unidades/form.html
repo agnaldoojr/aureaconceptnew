@@ -1,0 +1,41 @@
+{{define "conteudo"}}
+<div class="page-header">
+    <h1 class="page-title"><span class="page-title-icon">◆</span> <span>{{.Titulo}}</span></h1>
+    <a href="/unidades" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Voltar</a>
+</div>
+
+<div class="form-card">
+    <form action="/unidades/salvar" method="post" class="form-styled">
+        <input type="hidden" name="_csrf" value="{{.CSRF}}"/>
+        <input type="hidden" id="undCodigo" name="undCodigo" value="{{if .Dados.Unidade.Codigo}}{{.Dados.Unidade.Codigo}}{{end}}"/>
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label class="form-label required">Sigla</label>
+                <input type="text" id="undSigla" name="undSigla" value="{{.Dados.Unidade.Sigla}}" class="form-control" maxlength="10" required="required"
+                       placeholder="Ex.: CX" style="text-transform:uppercase"{{if gt .Dados.EmUso 0}} readonly="readonly"{{end}}/>
+                {{if eq .Dados.EmUso 0}}<small class="text-muted">Até 10 caracteres, sem espaços. Fica em maiúsculas.</small>{{end}}
+                {{if gt .Dados.EmUso 0}}<small class="text-muted">Usada por {{.Dados.EmUso}} produto(s): a sigla não pode ser trocada, só a descrição.</small>{{end}}
+            </div>
+            <div class="form-group col-8">
+                <label class="form-label required">Descrição</label>
+                <input type="text" id="undDescricao" name="undDescricao" value="{{.Dados.Unidade.Descricao}}" class="form-control" maxlength="60" required="required"
+                       placeholder="Ex.: Caixa"/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label class="form-label">Status</label>
+                <div class="toggle-group">
+                    <input type="checkbox" id="undAtivo" name="undAtivo" value="true"{{if .Dados.Unidade.Ativo}} checked="checked"{{end}} class="toggle-input"/>
+                    <input type="hidden" name="_undAtivo" value="on"/>
+                    <label for="undAtivo" class="toggle-label">Unidade ativa</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            <a href="/unidades" class="btn btn-cancel"><i class="fas fa-times"></i> Cancelar</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar unidade</button>
+        </div>
+    </form>
+</div>
+{{end}}

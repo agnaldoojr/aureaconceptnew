@@ -49,10 +49,24 @@ Itens da matriz: `testado` INF-08, SEG-04, SEG-05, SEG-06, SEG-07, SEG-10, SEG-1
 **Não testado ainda:** E2E Playwright e comparação visual automática (só vi o login no navegador e ele bate com a captura de referência), `/api` e `/vendedor/api`, celular real, Docker.
 **Correção:** na fatia 2 eu tinha criado uma "janela de 30 min" no limite de login; o antigo não tem isso (são 5 por IP+login, **30 por IP** e 15 min de bloqueio). Corrigido: `LOGIN_TENTATIVAS_IP=30`, sem `LOGIN_JANELA_MIN`.
 
+### Fatia 4: cadastros de Unidades de medida e Pessoas
+| Pacote / pasta | O que tem | Testes |
+|---|---|---|
+| `internal/cadastro` | Regras de `UnidadeMedidaService` e `PessoaService` do antigo, com as **mesmas mensagens**: sigla única em maiúsculas (≤ 10, sem espaço), descrição ≤ 60, sigla em uso não troca e unidade em uso não exclui; pessoa com nome ≤ 150, CPF/CNPJ único **só pelos dígitos** (quem já tinha o número pode ser editado), telefone repetido só avisa, nascimento não futuro, segmento inativo só se a pessoa já o tinha, exclusão em transação (documento vinculado barra e nada se perde) | 13 testes de integração + 2 unitários em `internal/web/cadastros_test.go` (SQLite real, telas e permissões) |
+| `internal/web` (`unidades.go`, `pessoas.go`, `cadastros.go`) | Rotas `/unidades` e `/pessoas` (lista, novo, editar, salvar, status, excluir), ligação de formulário como o Spring (caixa de marcação com o marcador `_campo`, 400 para número ruim, `redirect` + mensagem de uma só leitura) | idem |
+| `web/templates/unidades`, `web/templates/pessoas` | 4 telas portadas do Thymeleaf | **golden contra o antigo** (abaixo) |
+| `e2e/comparar-cadastros.mjs` + `e2e/rodar-golden.sh` + `e2e/lib/html.mjs` | **Roteiro de 83 passos rodado no sistema antigo e no novo**, ambos recriados do zero: compara status HTTP, redirecionamento, título e a **área de conteúdo da tela inteira** (HTML normalizado: atributos ordenados, entidades decodificadas, espaços e comentários ignorados; 100 a 530 linhas por tela) | **83 passos, 0 divergências** |
+| `tools/demo` | Carrega no banco novo os dados de exemplo que o `schema.sql` antigo cria (8 produtos, 8 pessoas, estoque, uma compra), **só para o golden** | usado pelo `rodar-golden.sh` |
+
+O golden achou, de saída, duas coisas que os testes escritos por mim não achariam: o banco antigo **já nasce com dados de exemplo** (D-19) e a entidade `&ecirc;` do Thymeleaf. Também confirmou comportamentos sutis do antigo: o menu não destaca "Pessoas" (D-18), excluir pessoa inexistente diz "Pessoa excluída!", editar com código que não existe **insere** uma pessoa nova, e erro de validação do nome/nascimento volta ao formulário com o digitado enquanto erro de CPF repetido volta à lista com a mensagem.
+
+Itens da matriz: `feito` CAD-08, CAD-09, CAD-10, CAD-11 (falta o E2E Playwright e o C da API); CAD-15 segue `pendente` (só Pessoas usa segmento por enquanto).
+**Não testado ainda:** E2E Playwright, pixel a pixel (a tela é o mesmo HTML com o mesmo CSS, mas não comparei imagens), celular real.
+
 ## Próximas fatias (ordem proposta)
 1. ~~Configuração por variáveis de ambiente e admin inicial~~ (feito na fatia 2).
 2. ~~Servidor HTTP: sessão, CSRF, limite de login, permissões, layout e estáticos~~ (feito na fatia 3; falta o conteúdo do dashboard).
-3. **Cadastros** (produtos com unidades e serviços, unidades, pessoas, usuários, permissões) + testes de integração e E2E.
+3. **Cadastros**: ~~unidades e pessoas~~ (fatia 4); faltam **produtos** (unidades extras, serviços, ativar/inativar, excluir D-03), **usuários** e **permissões** (perfis prontos).
 4. **Documentos + estoque + financeiro** (o núcleo transacional) com os testes *golden* (`e2e/semear.mjs` nos dois sistemas).
 5. **API `/api` e `/vendedor/api`** contra `docs/referencia/api/contrato.json`.
 6. **Salão** (agenda, comissões), **metas, dashboard, BI, relatórios**.

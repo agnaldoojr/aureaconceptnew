@@ -24,6 +24,7 @@ npm install                                   # instala o Playwright (só desenv
 bash ref-antigo.sh reset                      # recria o banco AureaRef e sobe o sistema antigo em http://localhost:8091
 node semear.mjs                               # dados de referência pelas telas e pela API (BASE_URL=... para outro sistema)
 node capturar-api.mjs                         # contrato real da API  -> docs/referencia/api/contrato.json
+bash rodar-golden.sh comparar-cadastros.mjs   # roteiro comparado antigo x novo (recria os dois; Unidades e Pessoas)
 $env:PW_CANAL='msedge'; node capturar-referencia.mjs   # telas -> docs/referencia/<perfil>/<desktop|mobile>/
 ```
 Requisitos para o sistema antigo: JDK 17+, SQL Server local (instância `SQLEXPRESS`, usuário de desenvolvimento) e o jar compilado no clone de referência

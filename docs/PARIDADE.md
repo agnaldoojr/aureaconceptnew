@@ -60,14 +60,14 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 | CAD-05 | Produto: unidade base válida e ativa; trocar base com extras exige remover antes | RN-PROD-02/04 | I | pendente |
 | CAD-06 | Produto: unidades extras (sigla, fator ≤ 1.000.000, preço opcional), preço sugerido por unidade | RN-UND-02 | U, I | pendente (regra U ✔) |
 | CAD-07 | Produto: categoria financeira de venda/compra, segmento | RN-FIN-03 | I | pendente |
-| CAD-08 | Unidades de medida: CRUD, sigla única sem diferenciar maiúscula/acento, em maiúsculas, bloqueios de trocar/excluir em uso | RN-UND-01 | U, I, E | pendente |
-| CAD-09 | Pessoas: lista com busca (nome/CPF/telefone), filtro de tipo e segmento | RN-PESSOA | I, E | pendente |
-| CAD-10 | Pessoas: novo/editar/excluir; papéis (cliente, fornecedor, vendedor, funcionário); segmentos; nascimento | §1 | I, E | pendente |
-| CAD-11 | CPF/CNPJ único comparando só dígitos (cadastro antigo repetido pode ser editado); telefone repetido só avisa | RN-PESSOA | U, I, C | pendente |
+| CAD-08 | Unidades de medida: CRUD, sigla única sem diferenciar maiúscula/acento, em maiúsculas, bloqueios de trocar/excluir em uso | RN-UND-01 | U, I, E | feito (I ✔ + G ✔ contra o antigo, 83 passos do roteiro; falta E; liga a Produtos quando a tela de produtos existir) |
+| CAD-09 | Pessoas: lista com busca (nome/CPF/telefone), filtro de tipo e segmento | RN-PESSOA | I, E | feito (I ✔ + G ✔: busca sem acento/maiúscula, por CPF e telefone, filtros de tipo e segmento, ordem; falta E) |
+| CAD-10 | Pessoas: novo/editar/excluir; papéis (cliente, fornecedor, vendedor, funcionário); segmentos; nascimento | §1 | I, E | feito (I ✔ + G ✔: novo, editar, excluir (com documento barra), papéis, segmentos, nascimento; falta E) |
+| CAD-11 | CPF/CNPJ único comparando só dígitos (cadastro antigo repetido pode ser editado); telefone repetido só avisa | RN-PESSOA | U, I, C | feito (U ✔ + I ✔ + G ✔: CPF único só pelos dígitos, editar com o próprio CPF, telefone repetido só avisa; falta C da API) |
 | CAD-12 | Usuários: lista, novo (senha obrigatória, perfil, vendedor vinculado ativo), editar (senha em branco mantém), status, excluir | RN-USR | I, E | pendente |
 | CAD-13 | Login do usuário único sem diferenciar maiúscula; `admin` não muda de login nem inativa nem exclui | RN-USR | I | pendente |
 | CAD-14 | Tela de permissões: matriz módulo × ação (checkboxes `inclusao_`…), aplicar perfil, módulos novos zerados | RN-PERM | I, E | pendente |
-| CAD-15 | Segmentos (Loja de roupa, Salão) semeados e usados em produto/pessoa/documento/título/DRE | §4 | I | pendente |
+| CAD-15 | Segmentos (Loja de roupa, Salão) semeados e usados em produto/pessoa/documento/título/DRE | §4 | I | pendente (Segmentos semeados e usados em Pessoas I ✔ + G ✔; falta produto, documento, título e DRE) |
 
 ## D. Documentos e estoque (DOC)
 

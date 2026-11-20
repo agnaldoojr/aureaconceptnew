@@ -43,6 +43,7 @@
 | T-23 | **Estáticos com hash no nome** (`/css/style-<32 hex do SHA-256>.css`) calculado na subida a partir do embed; o caminho sem hash também responde (como o Spring); URL com hash errado dá 404. Versionados: `max-age=31536000, immutable`; `vendor/` sem hash: 30 dias; o resto sem hash: `no-cache` + ETag (304) | INF-08 |
 | T-24 | **Cookie de sessão `JSESSIONID`** com 256 bits aleatórios; no banco fica **só o SHA-256** do identificador (quem lê o arquivo do banco ou um backup não consegue usar as sessões). Sessão anônima só para o token CSRF do formulário de login (30 min), trocada por uma sessão nova no login | SEG-05, SEG-07, SEG-08 |
 | T-25 | **IP do cliente atrás do Caddy** (`PROXY_CONFIAVEL`, padrão ligado em prod): vale o **último** valor de `X-Forwarded-For`, que o Caddy grava e não deixa o cliente forjar. Deixar ligado com o app exposto direto na internet permitiria forjar o IP e escapar do bloqueio de login (aviso no `.env.example`) | SEG-09 |
+| T-26 | **Teste golden como prova de paridade**: `e2e/rodar-golden.sh <roteiro>` recria o antigo (banco descartável `AureaRef`) e o novo (arquivo temporário + `tools/demo`) e roda o MESMO roteiro nos dois; compara status, redirecionamento, título e o conteúdo da tela normalizado. É mais forte que testes escritos só pela leitura do código, porque o antigo é o oráculo | PARIDADE (tipo G) |
 
 ## Estrutura do repositório (proposta)
 ```

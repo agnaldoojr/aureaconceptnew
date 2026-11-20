@@ -1,0 +1,87 @@
+{{define "conteudo"}}
+<div class="page-header">
+    <h1 class="page-title"><span class="page-title-icon">◆</span> <span>{{.Titulo}}</span></h1>
+    <a href="/pessoas" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Voltar</a>
+</div>
+
+<div class="form-card">
+    <form action="/pessoas/salvar" method="post" class="form-styled">
+        <input type="hidden" name="_csrf" value="{{.CSRF}}"/>
+        <input type="hidden" id="upsCodigo" name="upsCodigo" value="{{if .Dados.Pessoa.Codigo}}{{.Dados.Pessoa.Codigo}}{{end}}"/>
+
+        <div class="form-row">
+            <div class="form-group col-8">
+                <label class="form-label required">Nome completo</label>
+                <input type="text" id="upsNome" name="upsNome" value="{{.Dados.Pessoa.Nome}}" class="form-control" placeholder="Nome da pessoa ou empresa" required="required"/>
+                {{with index .Dados.Erros "upsNome"}}<span class="field-error">{{.}}</span>{{end}}
+            </div>
+            <div class="form-group col-4">
+                <label class="form-label">CPF / CNPJ</label>
+                <input type="text" id="upsCpf" name="upsCpf" value="{{.Dados.Pessoa.CPF}}" class="form-control" placeholder="000.000.000-00"/>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label class="form-label">Telefone</label>
+                <input type="text" id="upsTelefone" name="upsTelefone" value="{{.Dados.Pessoa.Telefone}}" class="form-control" placeholder="(00) 00000-0000"/>
+            </div>
+            <div class="form-group col-4">
+                <label class="form-label">Data de nascimento</label>
+                <input type="date" id="upsNascimento" name="upsNascimento" value="{{.Dados.Pessoa.Nascimento}}" class="form-control" max="{{.Dados.Hoje}}"/>
+                {{with index .Dados.Erros "upsNascimento"}}<span class="field-error">{{.}}</span>{{end}}
+            </div>
+        </div>
+
+        <div class="section-divider">Tipo de Pessoa</div>
+        <div class="checkbox-grid">
+            <label class="checkbox-card">
+                <input type="checkbox" id="upsCliente1" name="upsCliente" value="true"{{if .Dados.Pessoa.Cliente}} checked="checked"{{end}}/>
+                <input type="hidden" name="_upsCliente" value="on"/>
+                <i class="fas fa-user"></i>
+                <span>Cliente</span>
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="upsFornecedor1" name="upsFornecedor" value="true"{{if .Dados.Pessoa.Fornecedor}} checked="checked"{{end}}/>
+                <input type="hidden" name="_upsFornecedor" value="on"/>
+                <i class="fas fa-truck"></i>
+                <span>Fornecedor</span>
+            </label>
+            <label class="checkbox-card" title="Quem vende ou atende: aparece como vendedor nos documentos e como profissional nos serviços do salão">
+                <input type="checkbox" id="upsVendedor1" name="upsVendedor" value="true"{{if .Dados.Pessoa.Vendedor}} checked="checked"{{end}}/>
+                <input type="hidden" name="_upsVendedor" value="on"/>
+                <i class="fas fa-handshake"></i>
+                <span>Vendedor / profissional</span>
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="upsFuncionario1" name="upsFuncionario" value="true"{{if .Dados.Pessoa.Funcionario}} checked="checked"{{end}}/>
+                <input type="hidden" name="_upsFuncionario" value="on"/>
+                <i class="fas fa-id-badge"></i>
+                <span>Funcionário</span>
+            </label>
+        </div>
+
+        <div class="section-divider">Segmento</div>
+        <div class="checkbox-grid">
+            {{range .Dados.Segmentos}}<label class="checkbox-card">
+                <input type="checkbox" name="segmentoIds" value="{{.Codigo}}"{{if index $.Dados.Marcados .Codigo}} checked="checked"{{end}}/>
+                <i class="fas {{if contains .Nome "Sal"}}fa-scissors{{else}}fa-shirt{{end}}"></i>
+                <span>{{.Nome}}</span>
+            </label>{{end}}
+        </div>
+
+        <div class="form-group" style="margin-top:1.5rem">
+            <div class="toggle-group">
+                <input type="checkbox" id="upsAtivo" name="upsAtivo" value="true"{{if .Dados.Pessoa.Ativo}} checked="checked"{{end}} class="toggle-input"/>
+                <input type="hidden" name="_upsAtivo" value="on"/>
+                <label for="upsAtivo" class="toggle-label">Cadastro ativo</label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/pessoas" class="btn btn-cancel"><i class="fas fa-times"></i> Cancelar</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </form>
+</div>
+{{end}}

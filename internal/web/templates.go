@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
-	"path"
 	"strings"
 
 	ativos "github.com/agnaldoojr/aureaconceptnew/web"
@@ -28,30 +27,35 @@ func (s *Servidor) funcoes() template.FuncMap {
 			}
 			return false
 		},
+		// dataBR("2026-11-20") = "20/11/2026"; texto vazio ou inválido volta vazio
+		"dataBR": func(iso string) string {
+			if len(iso) < 10 || iso[4] != '-' || iso[7] != '-' {
+				return ""
+			}
+			return iso[8:10] + "/" + iso[5:7] + "/" + iso[0:4]
+		},
+		"contains": strings.Contains,
 	}
 }
 
-// carregarTemplates compila cada página junto com o layout base. login.html é independente (não usa o layout).
-
+// carregarTemplates compila cada página junto com o layout base (login.html é independente). As páginas ficam em
+// web/templates/<área>/<nome>.html e são chamadas por esse caminho (ex.: "pessoas/lista.html").
 func (s *Servidor) carregarTemplates() error {
 	s.paginas = map[string]*template.Template{}
-	entradas, err := fs.ReadDir(ativos.Templates, "templates")
-	if err != nil {
-		return err
-	}
-	for _, e := range entradas {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".html") {
-			continue
+	return fs.WalkDir(ativos.Templates, "templates", func(caminho string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() || !strings.HasSuffix(caminho, ".html") || strings.HasPrefix(caminho, "templates/layout/") {
+			return err
 		}
-		arquivos := []string{path.Join("templates", e.Name())}
-		if e.Name() != "login.html" {
-			arquivos = []string{"templates/layout/base.html", path.Join("templates", e.Name())}
+		nome := strings.TrimPrefix(caminho, "templates/")
+		arquivos := []string{caminho}
+		if nome != "login.html" {
+			arquivos = []string{"templates/layout/base.html", caminho}
 		}
-		t, err := template.New(e.Name()).Funcs(s.funcoes()).ParseFS(ativos.Templates, arquivos...)
+		t, err := template.New(nome).Funcs(s.funcoes()).ParseFS(ativos.Templates, arquivos...)
 		if err != nil {
-			return fmt.Errorf("template %s: %w", e.Name(), err)
+			return fmt.Errorf("template %s: %w", nome, err)
 		}
-		s.paginas[e.Name()] = t
-	}
-	return nil
+		s.paginas[nome] = t
+		return nil
+	})
 }

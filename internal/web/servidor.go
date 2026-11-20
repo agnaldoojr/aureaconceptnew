@@ -19,6 +19,7 @@ import (
 	ativos "github.com/agnaldoojr/aureaconceptnew/web"
 
 	"github.com/agnaldoojr/aureaconceptnew/internal/auth"
+	"github.com/agnaldoojr/aureaconceptnew/internal/cadastro"
 	"github.com/agnaldoojr/aureaconceptnew/internal/config"
 	"github.com/agnaldoojr/aureaconceptnew/internal/db"
 	"github.com/agnaldoojr/aureaconceptnew/internal/permissoes"
@@ -41,6 +42,7 @@ type Servidor struct {
 	banco   *db.Banco
 	sessoes *Sessoes
 	limite  *LimiteLogin
+	cad     *cadastro.Repo
 	est     *Estaticos
 	paginas map[string]*template.Template
 	log     *slog.Logger
@@ -99,6 +101,7 @@ func Novo(cfg *config.Config, banco *db.Banco, log *slog.Logger, op Opcoes) (*Se
 	s := &Servidor{
 		cfg: cfg, banco: banco, est: est, log: log, agora: agora, hashFalso: falso,
 		sessoes: NovaSessoes(banco, agora),
+		cad:     &cadastro.Repo{B: banco},
 		limite:  NovoLimiteLogin(cfg.LoginTentativas, cfg.LoginTentativasIP, cfg.LoginBloqueio, agora),
 	}
 	if err := s.carregarTemplates(); err != nil {
@@ -115,6 +118,8 @@ func (s *Servidor) Sessoes() *Sessoes { return s.sessoes }
 func (s *Servidor) rotas() {
 	s.mux.HandleFunc("GET /{$}", s.dashboard)
 	s.mux.HandleFunc("GET /dashboard", s.dashboard)
+	s.rotasUnidades()
+	s.rotasPessoas()
 	// as demais telas entram nas próximas fatias; até lá qualquer outro caminho (já autenticado e autorizado) é 404
 	s.mux.HandleFunc("/", s.naoEncontrado)
 }
