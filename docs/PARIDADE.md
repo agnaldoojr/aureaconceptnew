@@ -43,7 +43,7 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 | SEG-10 | 21 módulos × 4 direitos: tabela `Direito_Usuario`, authorities `MODULO_ACAO`, **`admin` sempre tem tudo** | `Permissoes` | U, I | testado (U ✔ + I ✔: o menu e o porteiro seguem os direitos lidos do banco a cada pedido) |
 | SEG-11 | Mapa rota → módulo → ação (inclui `salvar` com/sem id; `/agenda/bloqueios|horarios`; `/vendedor`, `/vendedor/api`; BI e `/financeiro` validados no controller) | `PermissaoInterceptor` | U, I | testado (U ✔ 85 rotas + I ✔ no porteiro real: Produtos, Pessoas, BI, lucratividade) |
 | SEG-12 | Negação: flash `erro` "Você não tem permissão para …" e redirect a `/dashboard` | §1 | I, E | feito (I ✔: mensagem por ação, de uma só leitura, volta ao `/dashboard`; falta E) |
-| SEG-13 | Perfis prontos: Vendedor da loja, Profissional do salão, Recepção, Gerência (aplicar na criação e na tela de permissões, substitui tudo, não vale para admin) | `PerfisAcesso` | U, I | feito (U ✔; falta I) |
+| SEG-13 | Perfis prontos: Vendedor da loja, Profissional do salão, Recepção, Gerência (aplicar na criação e na tela de permissões, substitui tudo, não vale para admin) | `PerfisAcesso` | U, I | testado (U ✔ + I ✔ + G ✔: os 4 perfis aplicados na criação e na tela, substituem tudo, não valem para o admin) |
 | SEG-14 | Escopo de vendas (`VENDAS_TODOS`): lista, abrir/editar/excluir, dashboard, relatório de documentos, BI/lucratividade bloqueados; sem vendedor vinculado = nada | `EscopoVendas` | I, E | pendente |
 | SEG-15 | Escopo da agenda (`AGENDA_TODOS`): só a própria agenda; servidor ignora o profissional enviado | `AgendaEscopo` | I | pendente |
 | SEG-16 | Tokens do app: 256 bits, só SHA-256 no banco, validade 30 dias, revogação, `ultimo_uso` a cada 10 min | `ApiTokenService` | U, I, C | pendente |
@@ -64,9 +64,9 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 | CAD-09 | Pessoas: lista com busca (nome/CPF/telefone), filtro de tipo e segmento | RN-PESSOA | I, E | feito (I ✔ + G ✔: busca sem acento/maiúscula, por CPF e telefone, filtros de tipo e segmento, ordem; falta E) |
 | CAD-10 | Pessoas: novo/editar/excluir; papéis (cliente, fornecedor, vendedor, funcionário); segmentos; nascimento | §1 | I, E | feito (I ✔ + G ✔: novo, editar, excluir (com documento barra), papéis, segmentos, nascimento; falta E) |
 | CAD-11 | CPF/CNPJ único comparando só dígitos (cadastro antigo repetido pode ser editado); telefone repetido só avisa | RN-PESSOA | U, I, C | feito (U ✔ + I ✔ + G ✔: CPF único só pelos dígitos, editar com o próprio CPF, telefone repetido só avisa; falta C da API) |
-| CAD-12 | Usuários: lista, novo (senha obrigatória, perfil, vendedor vinculado ativo), editar (senha em branco mantém), status, excluir | RN-USR | I, E | pendente |
-| CAD-13 | Login do usuário único sem diferenciar maiúscula; `admin` não muda de login nem inativa nem exclui | RN-USR | I | pendente |
-| CAD-14 | Tela de permissões: matriz módulo × ação (checkboxes `inclusao_`…), aplicar perfil, módulos novos zerados | RN-PERM | I, E | pendente |
+| CAD-12 | Usuários: lista, novo (senha obrigatória, perfil, vendedor vinculado ativo), editar (senha em branco mantém), status, excluir | RN-USR | I, E | feito (I ✔ + G ✔ 94 passos: lista, novo com senha BCrypt, perfil e vendedor vinculado, editar com senha em branco que mantém, status, exclusão (com documento barra), login real do usuário criado; falta E) |
+| CAD-13 | Login do usuário único sem diferenciar maiúscula; `admin` não muda de login nem inativa nem exclui | RN-USR | I | feito (I ✔ + G ✔: login único sem diferenciar maiúscula nem acento e aparado; `admin` não muda de login (só a caixa), não inativa e não exclui) |
+| CAD-14 | Tela de permissões: matriz módulo × ação (checkboxes `inclusao_`…), aplicar perfil, módulos novos zerados | RN-PERM | I, E | feito (I ✔ + G ✔: matriz com as colunas que cada módulo oferece, salvar (marcado = presente), aplicar perfil substitui tudo, não vale para o admin, módulo sem linha entra zerado; falta E; diferença decidida D-20: valem na hora) |
 | CAD-15 | Segmentos (Loja de roupa, Salão) semeados e usados em produto/pessoa/documento/título/DRE | §4 | I | pendente (Segmentos semeados e usados em Pessoas I ✔ + G ✔; falta produto, documento, título e DRE) |
 
 ## D. Documentos e estoque (DOC)

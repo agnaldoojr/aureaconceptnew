@@ -299,6 +299,9 @@ func (s *Servidor) produtosSalvar(w http.ResponseWriter, r *http.Request) {
 	}
 	p.DuracaoMin = duracao
 	erros = append(erros, cadastro.ValidarProduto(p, comissao, duracao)...)
+	if caixaRuim(r, "uprAtivo", "uprServico") {
+		erros = append(erros, cadastro.ErroCampo{Campo: "uprAtivo"}) // erro de ligação: volta ao formulário sem texto
+	}
 
 	titulo := "Editar Produto"
 	if cod == 0 {

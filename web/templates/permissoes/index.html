@@ -1,0 +1,87 @@
+{{define "conteudo"}}
+<div class="page-header">
+    <h1 class="page-title"><span class="page-title-icon">◆</span> <span>{{.Titulo}}</span></h1>
+    <a href="/usuarios" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Voltar</a>
+</div>
+
+<div class="info-banner">
+    <i class="fas fa-key"></i>
+    Configurando permissões de:
+    <strong>{{.Dados.Usuario.Nome}}</strong>
+    — <code>{{.Dados.Usuario.Login}}</code>
+</div>
+
+{{if .Dados.UsuarioAdmin}}<div class="info-banner">
+    <i class="fas fa-shield-halved"></i>
+    O administrador sempre tem acesso total ao sistema e não pode ter permissões removidas.
+</div>{{else}}<div class="info-banner">
+    <i class="fas fa-circle-info"></i>
+    <span><strong>Consulta</strong> abre as telas do módulo; <strong>Inclusão</strong>, <strong>Atualização</strong>
+    (editar/ativar) e <strong>Exclusão</strong> liberam as ações correspondentes. As mudanças valem na hora,
+    no próximo clique do usuário.</span>
+</div>{{end}}
+
+<!-- Perfis prontos: substituem todas as permissões marcadas abaixo (é outro formulário, enviado à parte) -->
+{{if not .Dados.UsuarioAdmin}}<form action="/usuarios/permissoes/{{.Dados.Usuario.Codigo}}/perfil" method="post"
+      class="form-card" style="margin-bottom:1rem"
+      onsubmit="return confirm('Aplicar este perfil? Todas as permissões atuais deste usuário serão substituídas.')">
+    <input type="hidden" name="_csrf" value="{{.CSRF}}"/>
+    <div class="form-row" style="align-items:flex-end">
+        <div class="form-group col-8" style="margin:0">
+            <label class="form-label" for="perfil">Aplicar um perfil pronto</label>
+            <select id="perfil" name="perfil" class="form-control" required="required">
+                <option value="">Selecione...</option>
+                {{range .Dados.Perfis}}<option value="{{.Codigo}}">{{.Nome}} — {{.Descricao}}</option>{{end}}
+            </select>
+        </div>
+        <div class="form-group col-4" style="margin:0">
+            <button type="submit" class="btn btn-outline"><i class="fas fa-wand-magic-sparkles"></i> Aplicar perfil</button>
+        </div>
+    </div>
+</form>{{end}}
+
+<form action="/usuarios/permissoes/{{.Dados.Usuario.Codigo}}" method="post" class="form-card">
+    <input type="hidden" name="_csrf" value="{{.CSRF}}"/>
+
+    <div class="permissions-table-wrapper">
+        <table class="data-table permissions-table">
+            <thead>
+                <tr>
+                    <th>Módulo</th>
+                    <th class="text-center"><i class="fas fa-plus-circle text-success"></i> Inclusão</th>
+                    <th class="text-center"><i class="fas fa-trash text-danger"></i> Exclusão</th>
+                    <th class="text-center"><i class="fas fa-eye text-info"></i> Consulta</th>
+                    <th class="text-center"><i class="fas fa-pen text-warning"></i> Atualização</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Dados.Linhas}}<tr>
+                    <td>
+                        <span class="module-name">
+                            <i class="fas {{.Icone}}"></i>
+                            <span>{{.Rotulo}}</span>
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        {{if .TemInclusao}}<input type="checkbox" class="perm-check" name="inclusao_{{.Modulo}}"{{if or $.Dados.UsuarioAdmin .Inclusao}} checked="checked"{{end}}{{if $.Dados.UsuarioAdmin}} disabled="disabled"{{end}}/>{{end}}
+                    </td>
+                    <td class="text-center">
+                        {{if .TemExclusao}}<input type="checkbox" class="perm-check" name="exclusao_{{.Modulo}}"{{if or $.Dados.UsuarioAdmin .Exclusao}} checked="checked"{{end}}{{if $.Dados.UsuarioAdmin}} disabled="disabled"{{end}}/>{{end}}
+                    </td>
+                    <td class="text-center">
+                        <input type="checkbox" class="perm-check" name="consulta_{{.Modulo}}"{{if or $.Dados.UsuarioAdmin .Consulta}} checked="checked"{{end}}{{if $.Dados.UsuarioAdmin}} disabled="disabled"{{end}}/>
+                    </td>
+                    <td class="text-center">
+                        {{if .TemAtualizacao}}<input type="checkbox" class="perm-check" name="atualizacao_{{.Modulo}}"{{if or $.Dados.UsuarioAdmin .Atualizacao}} checked="checked"{{end}}{{if $.Dados.UsuarioAdmin}} disabled="disabled"{{end}}/>{{end}}
+                    </td>
+                </tr>{{end}}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-actions">
+        <a href="/usuarios" class="btn btn-cancel"><i class="fas fa-times"></i> Cancelar</a>
+        <button type="submit" class="btn btn-primary"{{if .Dados.UsuarioAdmin}} disabled="disabled"{{end}}><i class="fas fa-save"></i> Salvar Permissões</button>
+    </div>
+</form>
+{{end}}

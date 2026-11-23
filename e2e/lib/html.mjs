@@ -52,7 +52,9 @@ export function normalizar(html) {
       attrs = attrs.map((a) => (/^value="[A-Za-z0-9_-]{40,}"$/.test(a) ? 'value="TOKEN"' : a));
       partes.push(`<${nome.toLowerCase()}${attrs.length ? ' ' + attrs.join(' ') : ''}>`);
     } else {
-      const txt = decodificar(p).replace(/\s+/g, ' ').trim();
+      // diferença DECIDIDA (D-20, T-21): o novo aplica permissões na hora; o antigo só no próximo login. Os dois textos valem o mesmo para a comparação.
+      const txt = decodificar(p).replace(/\s+/g, ' ').trim()
+        .replace(/valem a partir do próximo login do usuário\.?|valem na hora(?:, no próximo clique do usuário| para o usuário)\.?/gi, '⟦vigência⟧');
       if (txt) partes.push(txt);
     }
   }

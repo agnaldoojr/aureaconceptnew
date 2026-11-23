@@ -121,6 +121,7 @@ func (s *Servidor) rotas() {
 	s.rotasUnidades()
 	s.rotasPessoas()
 	s.rotasProdutos()
+	s.rotasUsuarios()
 	// as demais telas entram nas próximas fatias; até lá qualquer outro caminho (já autenticado e autorizado) é 404
 	s.mux.HandleFunc("/", s.naoEncontrado)
 }

@@ -61,6 +61,10 @@ func (s *Servidor) unidadesSalvar(w http.ResponseWriter, r *http.Request) {
 		pedidoRuim(w)
 		return
 	}
+	if caixaRuim(r, "undAtivo") { // no antigo este formulário não trata erro de ligação: o Spring responde 400
+		pedidoRuim(w)
+		return
+	}
 	u := cadastro.Unidade{Codigo: cod, Sigla: r.PostFormValue("undSigla"), Descricao: r.PostFormValue("undDescricao"), Ativo: caixa(r, "undAtivo", true)}
 	if err := s.cad.SalvarUnidade(r.Context(), u); err != nil {
 		s.flash(r, "erro", s.mensagemDeErro(err, "Não foi possível salvar a unidade."))

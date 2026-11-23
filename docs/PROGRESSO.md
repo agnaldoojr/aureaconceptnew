@@ -75,10 +75,24 @@ Itens da matriz: `feito` CAD-08, CAD-09, CAD-10, CAD-11 (falta o E2E Playwright 
 
 Itens da matriz: `feito` CAD-01 a CAD-07 (falta o E2E Playwright). **Diferença decidida (D-03):** excluir produto sem documento agora funciona (o antigo falhava sempre). **Não testado:** E2E Playwright, pixel a pixel, celular real; o preço sugerido por unidade (CAD-06) é do documento.
 
+### Fatia 6: Usuários e Permissões
+| Pacote / pasta | O que tem | Testes |
+|---|---|---|
+| `internal/cadastro/usuario.go` | Regras do `UsuarioService`: novo usuário com senha em BCrypt (fator 10), 21 linhas de direito (Consulta nos 5 módulos padrão) e perfil opcional na mesma transação; edição que só copia nome, login, status, vendedor e senha (em branco mantém); login único sem diferenciar maiúscula nem acento; `admin` protegido; vendedor vinculado precisa ser vendedor ativo; status; exclusão; matriz de permissões (módulo sem linha entra zerado), aplicar perfil (substitui tudo, não vale para o admin); código queimado quando o cadastro falha depois de gravar | 12 testes de integração em `internal/web/usuarios_test.go` + 1 unitário (ordem `CASE_INSENSITIVE_ORDER` do Java) |
+| `internal/web` (`usuarios.go`) | Rotas `/usuarios/**` e `/usuarios/permissoes/**` (9 rotas) | idem |
+| `web/templates/usuarios`, `web/templates/permissoes` | Lista, formulário e a matriz módulo × ação | **golden contra o antigo: 94 passos, 0 divergências** |
+| `e2e/comparar-usuarios.mjs`, `e2e/lib/html.mjs` | Roteiro de Usuários e Permissões; o normalizador trata como iguais as duas redações da diferença decidida D-20 ("valem a partir do próximo login" × "valem na hora") | idem |
+
+O golden desta fatia achou três coisas: (1) uma caixa de marcação enviada com valor **vazio** é erro de ligação no Spring — volta ao formulário (nas Unidades, que não tratam erro, dá 400) e o formulário mostra a caixa desmarcada; (2) a ordem dos vendedores do antigo vem do Java (`CASE_INSENSITIVE_ORDER`: ignora a caixa mas **não** o acento); (3) o código queimado também vale para `Usuarios`.
+Reconferi os roteiros de Unidades/Pessoas (83 passos) e de Produtos (100) depois da mudança: **0 divergências**. Total comparado com o antigo até aqui: **277 passos**.
+
+**Diferença decidida (D-20):** as permissões valem **na hora** (T-21), então os textos "valem a partir do próximo login do usuário" viraram "valem na hora…". Itens da matriz: `feito` CAD-12, CAD-13, CAD-14 (falta o E2E); `testado` SEG-13.
+**Não testado:** E2E Playwright, pixel a pixel, celular real; o uso do vendedor vinculado no app e nos documentos vem com a API e os documentos.
+
 ## Próximas fatias (ordem proposta)
 1. ~~Configuração por variáveis de ambiente e admin inicial~~ (feito na fatia 2).
 2. ~~Servidor HTTP: sessão, CSRF, limite de login, permissões, layout e estáticos~~ (feito na fatia 3; falta o conteúdo do dashboard).
-3. **Cadastros**: ~~unidades, pessoas e produtos~~ (fatias 4 e 5); faltam **usuários** e **permissões** (perfis prontos).
+3. ~~Cadastros: unidades, pessoas, produtos, usuários e permissões~~ (fatias 4 a 6).
 4. **Documentos + estoque + financeiro** (o núcleo transacional) com os testes *golden* (`e2e/semear.mjs` nos dois sistemas).
 5. **API `/api` e `/vendedor/api`** contra `docs/referencia/api/contrato.json`.
 6. **Salão** (agenda, comissões), **metas, dashboard, BI, relatórios**.

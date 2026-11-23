@@ -117,6 +117,9 @@ func (s *Servidor) pessoasSalvar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	erros := cadastro.ValidarPessoa(p, s.hoje())
+	if caixaRuim(r, "upsCliente", "upsFornecedor", "upsVendedor", "upsFuncionario", "upsAtivo") {
+		erros = append(erros, cadastro.ErroCampo{Campo: "upsAtivo"}) // erro de ligação: volta ao formulário sem texto
+	}
 	mensagens := map[string]string{}
 	if !cadastro.ValidarNascimento(p.Nascimento) {
 		// o antigo mostraria o texto técnico do Spring ("Failed to convert…"); aqui uma frase clara (D-18)

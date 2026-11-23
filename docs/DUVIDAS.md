@@ -109,3 +109,6 @@ O `schema.sql` do antigo cria **8 produtos, 8 pessoas, estoque e uma compra de e
 
 ### D-03 · Excluir produto — **implementado (b)** em 22/11/2026
 Com a opção que você escolheu (corrigir): produto **sem documento e sem saldo** é excluído junto com a linha de estoque zerada e as unidades extras; com documento ou saldo, nada é apagado e a mensagem continua a do antigo. O golden marca essa diferença como "decidida".
+
+### D-20 · Permissões valem na hora (decidido, consequência de T-21)
+No antigo uma mudança de permissão só valia no **próximo login** do usuário (as autoridades ficavam congeladas na sessão); por isso as telas diziam "valem a partir do próximo login". No novo as permissões são lidas do banco a cada clique (T-21), então valem **na hora** e os três textos (aviso da tela, mensagem de "perfil aplicado" e de "permissões salvas") foram ajustados para dizer isso. Se preferir o comportamento antigo (permissão congelada até o próximo login), é uma mudança pequena, mas ela perde a vantagem de cortar o acesso de quem foi desligado.

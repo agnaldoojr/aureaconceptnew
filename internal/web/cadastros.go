@@ -52,7 +52,7 @@ func caixa(r *http.Request, campo string, padrao bool) bool {
 		if v, ok := booleano(vs[0]); ok {
 			return v
 		}
-		return padrao
+		return false // valor que não é booleano (ver caixaRuim): o formulário que volta mostra a caixa desmarcada
 	}
 	if _, ok := r.PostForm["_"+campo]; ok {
 		return false
@@ -96,4 +96,17 @@ func (s *Servidor) mensagemDeErro(err error, generica string) string {
 	}
 	s.log.Error("erro no cadastro", "erro", err)
 	return generica
+}
+
+// caixaRuim diz se alguma das caixas veio com um valor que não é booleano (por exemplo vazio): para o Spring isso é um erro de
+// ligação do campo. Nunca acontece num navegador, que ou envia "true" ou não envia nada.
+func caixaRuim(r *http.Request, campos ...string) bool {
+	for _, c := range campos {
+		if vs, ok := r.PostForm[c]; ok && len(vs) > 0 {
+			if _, ok := booleano(vs[0]); !ok {
+				return true
+			}
+		}
+	}
+	return false
 }

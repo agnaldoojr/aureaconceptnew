@@ -1,0 +1,48 @@
+{{define "conteudo"}}
+<div class="page-header">
+    <h1 class="page-title"><span class="page-title-icon">◆</span> Usuários</h1>
+    {{if pode .Auth "USUARIOS_INCLUSAO"}}<a href="/usuarios/novo" class="btn btn-primary"><i class="fas fa-plus"></i> Novo Usuário</a>{{end}}
+</div>
+
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr><th>Código</th><th>Nome</th><th>Login</th><th>Vendedor</th><th>Status</th><th class="col-actions">Ações</th></tr>
+        </thead>
+        <tbody>
+            {{range .Dados.Usuarios}}<tr>
+                <td>{{.Codigo}}</td>
+                <td class="fw-500">{{.Nome}}</td>
+                <td><code>{{.Login}}</code></td>
+                <td>{{if .VendedorID}}{{.VendedorNome}}{{else}}—{{end}}</td>
+                <td>
+                    <span class="badge {{if .Ativo}}badge-green{{else}}badge-gray{{end}}">{{if .Ativo}}Ativo{{else}}Inativo{{end}}</span>
+                </td>
+                <td class="actions-cell">
+                    {{if pode $.Auth "PERMISSOES_CONSULTA"}}<a href="/usuarios/permissoes/{{.Codigo}}" class="btn btn-sm btn-outline" title="Permissões">
+                        <i class="fas fa-key"></i>
+                    </a>{{end}}
+                    {{if pode $.Auth "USUARIOS_ATUALIZACAO"}}<a href="/usuarios/editar/{{.Codigo}}" class="btn btn-sm btn-edit">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                    <form action="/usuarios/status/{{.Codigo}}" method="post" style="display:inline">
+                        <input type="hidden" name="_csrf" value="{{$.CSRF}}"/>
+                        <input type="hidden" name="ativo" value="{{if .Ativo}}false{{else}}true{{end}}"/>
+                        <button type="submit" class="btn btn-sm {{if .Ativo}}btn-warning{{else}}btn-success{{end}}"
+                                title="{{if .Ativo}}Inativar{{else}}Ativar{{end}}">
+                            <i class="fas {{if .Ativo}}fa-ban{{else}}fa-check{{end}}"></i>
+                        </button>
+                    </form>{{end}}
+                    {{if pode $.Auth "USUARIOS_EXCLUSAO"}}<form action="/usuarios/excluir/{{.Codigo}}" method="post" style="display:inline"
+                          onsubmit="return confirm('Excluir este usuário?')">
+                        <input type="hidden" name="_csrf" value="{{$.CSRF}}"/>
+                        <button type="submit" class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></button>
+                    </form>{{end}}
+                </td>
+            </tr>{{else}}<tr>
+                <td colspan="6" class="text-center text-muted">Nenhum usuário cadastrado.</td>
+            </tr>{{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}
