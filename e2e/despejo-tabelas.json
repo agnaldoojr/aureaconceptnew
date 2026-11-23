@@ -1,0 +1,143 @@
+{
+  "_ajuda": "Tabelas e colunas comparadas entre o banco ANTIGO (SQL Server) e o NOVO (SQLite) depois de um roteiro golden. ':n' multiplica por 10^n (os valores do novo já são inteiros escalados), ':d' é data, ':b' é booleano. Sem carimbos de data/hora e sem hashes de senha.",
+  "Unidade_Medida": [
+    "und_codigo",
+    "und_sigla",
+    "und_descricao",
+    "und_ativo:b"
+  ],
+  "Pessoas": [
+    "ups_codigo",
+    "ups_nome",
+    "ups_cpf",
+    "ups_telefone",
+    "ups_cliente:b",
+    "ups_fornecedor:b",
+    "ups_vendedor:b",
+    "ups_funcionario:b",
+    "ups_ativo:b",
+    "ups_nascimento:d"
+  ],
+  "Pessoa_Segmento": [
+    "ps_ups_codigo",
+    "ps_seg_codigo"
+  ],
+  "Produto": [
+    "upr_codigo",
+    "upr_nome",
+    "upr_complemento",
+    "upr_und",
+    "upr_preco:2",
+    "upr_ativo:b",
+    "upr_cat_venda",
+    "upr_cat_compra",
+    "upr_seg_codigo",
+    "upr_servico:b",
+    "upr_comissao_perc:2",
+    "upr_duracao_min"
+  ],
+  "Produto_Unidade": [
+    "pun_codigo",
+    "pun_upr_codigo",
+    "pun_sigla",
+    "pun_fator:6",
+    "pun_preco:2"
+  ],
+  "Estoque": [
+    "est_upr_codigo",
+    "est_qtd:3",
+    "est_valor_custo:4"
+  ],
+  "Usuarios": [
+    "usu_codigo",
+    "usu_nome",
+    "usu_login",
+    "usu_ativo:b",
+    "usu_ups_vendedor"
+  ],
+  "Direito_Usuario": {
+    "onde": "dusu_usu_codigo <> 1",
+    "_porque": "o admin sempre tem tudo (por código); o antigo só tinha 10 linhas dele até alguém abrir a tela de permissões, o novo cria as 21 já no primeiro boot; por isso o código da linha (dusu_codigo) também não é comparado",
+    "cols": [
+      "dusu_usu_codigo",
+      "dusu_descricao",
+      "dusu_inclusao:b",
+      "dusu_exclusao:b",
+      "dusu_consulta:b",
+      "dusu_atualizacao:b"
+    ],
+    "ordem": "dusu_usu_codigo, dusu_descricao"
+  },
+  "Documento": [
+    "docto_codigo",
+    "docto_tipo",
+    "docto_data:d",
+    "docto_valor:2",
+    "docto_ups_codigo",
+    "docto_usu_codigo",
+    "docto_classificacao",
+    "docto_vendedor",
+    "docto_seg_codigo"
+  ],
+  "Itens_Documento": [
+    "itemdocto_codigo",
+    "itemdocto_docto_codigo",
+    "itemdocto_upr_codigo",
+    "itemdocto_upr_und",
+    "itemdocto_qtd:3",
+    "itemdocto_valor:2",
+    "itemdocto_total:2",
+    "itemdocto_fator:6",
+    "itemdocto_prof_codigo",
+    "itemdocto_comissao_perc:2"
+  ],
+  "Titulo": [
+    "tit_codigo",
+    "tit_natureza",
+    "tit_origem",
+    "tit_docto_codigo",
+    "tit_ups_codigo",
+    "tit_cat_codigo",
+    "tit_fpg_codigo",
+    "tit_tpt_codigo",
+    "tit_descricao",
+    "tit_parcela",
+    "tit_total_parcelas",
+    "tit_emissao:d",
+    "tit_competencia:d",
+    "tit_vencimento:d",
+    "tit_valor:2",
+    "tit_valor_baixado:2",
+    "tit_status",
+    "tit_baixa_origem",
+    "tit_usu_codigo",
+    "tit_seg_codigo"
+  ],
+  "Baixa": [
+    "bx_codigo",
+    "bx_tit_codigo",
+    "bx_data:d",
+    "bx_cfn_codigo",
+    "bx_fpg_codigo",
+    "bx_valor:2",
+    "bx_juros:2",
+    "bx_multa:2",
+    "bx_desconto:2",
+    "bx_taxa:2",
+    "bx_observacao",
+    "bx_automatica:b",
+    "bx_estornada:b",
+    "bx_usu_codigo"
+  ],
+  "Movimento_Conta": [
+    "mov_codigo",
+    "mov_cfn_codigo",
+    "mov_data:d",
+    "mov_tipo",
+    "mov_valor:2",
+    "mov_descricao",
+    "mov_bx_codigo",
+    "mov_conciliado:b",
+    "mov_trf_codigo"
+  ]
+}

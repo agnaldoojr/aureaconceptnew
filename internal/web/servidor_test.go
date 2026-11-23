@@ -640,11 +640,11 @@ func TestSemPermissaoVoltaAoDashboardComMensagemDeUmaLeitura(t *testing.T) {
 
 func TestComPermissaoPassaDoPorteiro(t *testing.T) {
 	a := novoAmbiente(t, nil)
-	a.criarUsuario("ana", "Ana", "Ana-Senha-123", true, "ESTOQUE:C")
+	a.criarUsuario("ana", "Ana", "Ana-Senha-123", true, "AGENDA:C")
 	n := a.novoNavegador()
 	n.entrar("ana", "Ana-Senha-123")
 	// a tela de produtos ainda não existe (próxima fatia): passar pela permissão significa chegar ao 404, não ao redirecionamento
-	resp, _ := n.get("/estoque")
+	resp, _ := n.get("/agenda")
 	if resp.StatusCode != 404 {
 		t.Fatalf("esperado 404 (passou na permissão, tela ainda não migrada), veio %d → %s", resp.StatusCode, resp.Header.Get("Location"))
 	}

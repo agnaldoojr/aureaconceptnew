@@ -26,5 +26,8 @@ for i in $(seq 1 20); do [ "$(curl -s -o /dev/null -w '%{http_code}' "http://loc
 echo "== roteiro $ROTEIRO"
 (cd "$AQUI" && SENHA_NOVO="$SENHA_NOVO" BASE_NOVO="http://localhost:$PORTA_NOVO" node "$ROTEIRO")
 CODIGO=$?
+echo "== estado final do banco (antigo x novo)"
+ESPERA=$(grep -m1 "^// DESPEJO_ESPERA:" "$AQUI/$ROTEIRO" | sed -e "s#^// DESPEJO_ESPERA: *##" -e "s# *(.*##" -e "s# ##g")
+(cd "$AQUI" && DESPEJO_ESPERA="$ESPERA" node despejo.mjs "$TMPD/aurea.db") || CODIGO=1
 powershell -NoProfile -Command "Get-Process aurea -ErrorAction SilentlyContinue | Stop-Process -Force" >/dev/null 2>&1
 exit $CODIGO

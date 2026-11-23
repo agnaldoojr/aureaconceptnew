@@ -1,0 +1,56 @@
+{{define "conteudo"}}
+<div class="page-header">
+    <h1 class="page-title"><span class="page-title-icon">◆</span> Controle de Estoque</h1>
+    <div class="header-stats">
+        <span class="stat-pill">
+            <i class="fas fa-dollar-sign"></i>
+            Valor Total:
+            <strong>{{.Dados.ValorTotal}}</strong>
+        </span>
+    </div>
+</div>
+
+<!-- Filtros rápidos -->
+<div class="filter-tabs">
+    <a href="/estoque" class="filter-tab{{if eq .Dados.Filtro ""}} active{{end}}">
+        <i class="fas fa-list"></i> Todos
+    </a>
+    <a href="/estoque?filtro=baixo" class="filter-tab{{if eq .Dados.Filtro "baixo"}} active{{end}}">
+        <i class="fas fa-exclamation-triangle"></i> Estoque Baixo
+    </a>
+</div>
+
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Produto</th>
+                <th>Und.</th>
+                <th class="text-right">Quantidade</th>
+                <th class="text-right">Custo Médio</th>
+                <th class="text-right">Valor em Estoque</th>
+                <th>Situação</th>
+            </tr>
+        </thead>
+        <tbody>
+        {{range .Dados.Linhas}}<tr{{if .Classe}} class="{{.Classe}}"{{end}}>
+                <td>{{.Codigo}}</td>
+                <td class="fw-500">{{.Nome}}</td>
+                <td>{{.Und}}</td>
+                <td class="text-right">{{.Qtd}}</td>
+                <td class="text-right">{{.Custo}}</td>
+                <td class="text-right fw-500">{{.ValorTotal}}</td>
+                <td>
+                    {{if eq .Situacao "zero"}}<span class="badge badge-red">Sem estoque</span>{{end}}
+                    {{if eq .Situacao "baixo"}}<span class="badge badge-orange">Estoque baixo</span>{{end}}
+                    {{if eq .Situacao "normal"}}<span class="badge badge-green">Normal</span>{{end}}
+                </td>
+            </tr>{{else}}<tr>
+                <td colspan="7" class="text-center text-muted">Nenhum produto no estoque.</td>
+            </tr>{{end}}
+        </tbody>
+    </table>
+</div>
+
+{{end}}

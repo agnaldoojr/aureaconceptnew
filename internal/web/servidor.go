@@ -22,6 +22,7 @@ import (
 	"github.com/agnaldoojr/aureaconceptnew/internal/cadastro"
 	"github.com/agnaldoojr/aureaconceptnew/internal/config"
 	"github.com/agnaldoojr/aureaconceptnew/internal/db"
+	"github.com/agnaldoojr/aureaconceptnew/internal/documentos"
 	"github.com/agnaldoojr/aureaconceptnew/internal/permissoes"
 )
 
@@ -43,6 +44,7 @@ type Servidor struct {
 	sessoes *Sessoes
 	limite  *LimiteLogin
 	cad     *cadastro.Repo
+	docs    *documentos.Servico
 	est     *Estaticos
 	paginas map[string]*template.Template
 	log     *slog.Logger
@@ -59,10 +61,11 @@ type Opcoes struct {
 
 // Usuario é o usuário logado numa requisição.
 type Usuario struct {
-	ID    int64
-	Login string
-	Nome  string
-	Auth  permissoes.Conjunto
+	ID         int64
+	Login      string
+	Nome       string
+	VendedorID *int64 // vendedor (pessoa) vinculado ao usuário
+	Auth       permissoes.Conjunto
 }
 
 type chaveCtx struct{}
@@ -102,6 +105,7 @@ func Novo(cfg *config.Config, banco *db.Banco, log *slog.Logger, op Opcoes) (*Se
 		cfg: cfg, banco: banco, est: est, log: log, agora: agora, hashFalso: falso,
 		sessoes: NovaSessoes(banco, agora),
 		cad:     &cadastro.Repo{B: banco},
+		docs:    &documentos.Servico{B: banco, Agora: func() time.Time { return agora().In(cfg.Local) }},
 		limite:  NovoLimiteLogin(cfg.LoginTentativas, cfg.LoginTentativasIP, cfg.LoginBloqueio, agora),
 	}
 	if err := s.carregarTemplates(); err != nil {
@@ -122,6 +126,8 @@ func (s *Servidor) rotas() {
 	s.rotasPessoas()
 	s.rotasProdutos()
 	s.rotasUsuarios()
+	s.rotasEstoque()
+	s.rotasDocumentos()
 	// as demais telas entram nas próximas fatias; até lá qualquer outro caminho (já autenticado e autorizado) é 404
 	s.mux.HandleFunc("/", s.naoEncontrado)
 }
@@ -362,7 +368,12 @@ func (s *Servidor) logout(w http.ResponseWriter, r *http.Request) {
 func (s *Servidor) carregarUsuario(ctx context.Context, id int64) (*Usuario, error) {
 	var u Usuario
 	var ativo int
-	err := s.banco.R.QueryRowContext(ctx, `SELECT usu_codigo, usu_login, usu_nome, usu_ativo FROM Usuarios WHERE usu_codigo = ?`, id).Scan(&u.ID, &u.Login, &u.Nome, &ativo)
+	var vendedor sql.NullInt64
+	err := s.banco.R.QueryRowContext(ctx, `SELECT usu_codigo, usu_login, usu_nome, usu_ativo, usu_ups_vendedor FROM Usuarios WHERE usu_codigo = ?`, id).Scan(&u.ID, &u.Login, &u.Nome, &ativo, &vendedor)
+	if err == nil && vendedor.Valid {
+		v := vendedor.Int64
+		u.VendedorID = &v
+	}
 	if err != nil || ativo != 1 {
 		return nil, err
 	}

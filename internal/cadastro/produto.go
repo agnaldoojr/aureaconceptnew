@@ -563,18 +563,7 @@ func (r *Repo) SalvarProduto(ctx context.Context, p *Produto, linhas []LinhaUnid
 	return id, err
 }
 
-// queimarCodigo faz o próximo AUTOINCREMENT da tabela começar depois de id (o SQLite desfaz o contador junto com a transação;
-// o SQL Server não).
+// queimarCodigo faz o próximo AUTOINCREMENT da tabela começar depois de id (ver db.Banco.QueimarCodigo).
 func (r *Repo) queimarCodigo(ctx context.Context, tabela string, id int64) {
-	res, err := r.B.W.ExecContext(ctx, `UPDATE sqlite_sequence SET seq = ? WHERE name = ? AND seq < ?`, id, tabela, id)
-	if err != nil {
-		return
-	}
-	if n, _ := res.RowsAffected(); n > 0 {
-		return
-	}
-	var existe int
-	if err := r.B.W.QueryRowContext(ctx, `SELECT count(*) FROM sqlite_sequence WHERE name = ?`, tabela).Scan(&existe); err == nil && existe == 0 {
-		_, _ = r.B.W.ExecContext(ctx, `INSERT INTO sqlite_sequence (name, seq) VALUES (?, ?)`, tabela, id)
-	}
+	r.B.QueimarCodigo(ctx, tabela, id)
 }

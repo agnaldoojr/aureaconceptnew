@@ -89,11 +89,28 @@ Reconferi os roteiros de Unidades/Pessoas (83 passos) e de Produtos (100) depois
 **Diferença decidida (D-20):** as permissões valem **na hora** (T-21), então os textos "valem a partir do próximo login do usuário" viraram "valem na hora…". Itens da matriz: `feito` CAD-12, CAD-13, CAD-14 (falta o E2E); `testado` SEG-13.
 **Não testado:** E2E Playwright, pixel a pixel, celular real; o uso do vendedor vinculado no app e nos documentos vem com a API e os documentos.
 
+### Fatia 7: Estoque, Documentos e o núcleo do financeiro
+| Pacote / pasta | O que tem | Testes |
+|---|---|---|
+| `internal/estoque` | Entrada com custo médio ponderado, saída (saldo insuficiente barra), entrada sem mexer no custo; serviço não tem estoque; tudo na unidade base | via documentos |
+| `internal/financeiro` (`nucleo.go`) | O que o documento usa do financeiro: gerar títulos de venda (a receber) e compra (a pagar) com parcelas (total exato, resto na última), vencimentos, categoria (escolhida → maior soma dos itens → do sistema), **baixa automática** com movimento no extrato, **taxa de cartão** como título PAGAR já baixado, desfazer tudo ao editar/excluir (baixa manual e conciliada bloqueiam), resumo para a tela. A baixa manual e o estorno vão reaproveitar `baixarInterno` | idem |
+| `internal/documentos` | `Salvar`, `Atualizar`, `Excluir` na **ordem de verificações do antigo**, numa transação: classificação, serviços e comissão, segmento do item de maior valor, saldo de cada item, estoque, títulos; códigos queimados quando falha depois de gravar | 13 testes de integração (`documentos_test.go`) |
+| `internal/web` (`documentos.go`, `estoque.go`) | Lista com filtros e escopo de vendedor, formulário (com o JS do antigo), visualizar, editar, excluir e a tela de estoque (números com o arredondamento HALF_EVEN do Java) | idem |
+| `internal/dominio/formato.go` | `FormatarBR` = `#numbers.formatDecimal` do Thymeleaf (HALF_EVEN, qualquer tamanho) e `Escala` = o que o BigDecimal imprime | 2 testes unitários |
+| `e2e/comparar-documentos.mjs` | **164 passos, 0 divergências** (e só a diferença decidida D-21): telas e mensagens dos 4 tipos, entradas e saídas, compras e vendas em todas as formas, edição, exclusão | + estado final |
+| `e2e/despejo.mjs`, `tools/despejo`, `e2e/despejo-tabelas.json` | **Compara o banco inteiro** (13 tabelas) do antigo e do novo depois de cada roteiro: 27 documentos, 31 itens, 29 títulos, 10 baixas, 10 movimentos e o estoque batem linha a linha | todos os roteiros |
+
+**O que o golden achou nesta fatia:** (1) o **defeito latente do antigo** (D-21): venda com fração de centavo em PIX/Dinheiro falha; (2) a ordem da lista de documentos na mesma data é pelo **código decrescente**; (3) o Jackson do antigo escreve as chaves do JSON das unidades em **ordem aleatória** (o comparador agora compara pelo conteúdo); (4) o cadastro do admin do antigo só tinha 10 linhas de direito até alguém abrir a tela de permissões (o novo cria as 21 já no boot; o comparador ignora o admin nessa tabela).
+**Total comparado com o antigo até aqui: 441 passos** (83 + 100 + 94 + 164) **e as 13 tabelas do banco** depois de cada roteiro, **0 divergências** fora das diferenças decididas (D-03, D-20, D-21).
+
+Itens da matriz: `testado` DOC-04, DOC-07, DOC-08, DOC-11, DOC-12, DOC-13, DOC-15, FIN-02, FIN-04, FIN-10; `feito` DOC-01, DOC-02, DOC-03, DOC-05, DOC-06, DOC-09, DOC-10, DOC-14, DOC-17, FIN-01, FIN-03, FIN-07.
+**Não testado ainda:** E2E Playwright, o golden da **taxa de cartão** (precisa do cadastro de formas do financeiro), a venda a partir da agenda (D-22), a API (C), relatórios (DOC-18 a DOC-20), celular real.
+
 ## Próximas fatias (ordem proposta)
 1. ~~Configuração por variáveis de ambiente e admin inicial~~ (feito na fatia 2).
 2. ~~Servidor HTTP: sessão, CSRF, limite de login, permissões, layout e estáticos~~ (feito na fatia 3; falta o conteúdo do dashboard).
 3. ~~Cadastros: unidades, pessoas, produtos, usuários e permissões~~ (fatias 4 a 6).
-4. **Documentos + estoque + financeiro** (o núcleo transacional) com os testes *golden* (`e2e/semear.mjs` nos dois sistemas).
+4. ~~Documentos + estoque + núcleo do financeiro~~ (fatia 7). Falta o **Financeiro** (títulos, baixa manual, estorno, contas, extrato, conciliação, transferências, cadastros, fluxo, DRE) e os **relatórios**.
 5. **API `/api` e `/vendedor/api`** contra `docs/referencia/api/contrato.json`.
 6. **Salão** (agenda, comissões), **metas, dashboard, BI, relatórios**.
 7. **Backup/restore para o Google Drive**, Docker/Caddy, `cmd/migrar`, medição de RAM.

@@ -73,23 +73,23 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 
 | ID | Funcionalidade | Referência | Testes | Status |
 |---|---|---|---|---|
-| DOC-01 | Lista de documentos com filtros tipo/período e escopo de vendedor; aviso "só minhas vendas" | §1, RN-ESCOPO | I, E, G | pendente |
-| DOC-02 | Novo documento: COMPRA, VENDA, ENTRADA, SAIDA; pessoa, data, itens (produto, qtd, valor, unidade, profissional), forma, parcelas, 1º vencimento, categoria, vendedor, segmento | RN-DOC-01 | I, E, G | pendente |
-| DOC-03 | Classificação obrigatória em ENTRADA/SAIDA (AJUSTE/TRANSFERENCIA/QUEBRA); QUEBRA só em SAIDA | RN-DOC-02 | U, I | pendente |
-| DOC-04 | Item: qtd ≥ 0,001, valor ≥ 0,01, total = qtd × valor, `docto_valor` = soma ⚠ D-05 | RN-DOC-03 | U, I, G | pendente (regra U ✔) |
-| DOC-05 | Segmento do documento (escolhido ou o do item de maior valor; nenhum = Geral) | RN-DOC-04 | U, I | pendente |
-| DOC-06 | Serviços: só em venda/compra; comissão exige profissional; guarda % do momento; item não serviço sem profissional | RN-DOC-05 | U, I | pendente |
-| DOC-07 | Estoque na unidade base: `qtdBase` (3 casas), `valorBase` (4 casas HALF_UP), fator gravado no item | RN-EST-01 | U, I, G | pendente (regra U ✔) |
-| DOC-08 | **Custo médio ponderado** na entrada (4 casas HALF_UP); saída não altera custo; custo 0 se saldo ≤ 0 | RN-EST-02/03 | U, I, G | pendente (regra U ✔) |
-| DOC-09 | Saída bloqueia estoque insuficiente (mensagem "Disponível | Solicitado"); estoque nunca negativo | RN-EST-03 | U, I, C | pendente |
-| DOC-10 | Serviço não movimenta estoque | RN-EST-04 | U, I | pendente |
-| DOC-11 | Salvar tudo na mesma transação (estoque + títulos); falha desfaz tudo | RN-DOC-06 | I | pendente |
-| DOC-12 | Editar documento: refaz financeiro e estoque (reversão, validação de saldo, bloqueio por baixa manual/conciliada) | RN-DOC-07 | I, G | pendente |
-| DOC-13 | Excluir documento: reverte estoque e financeiro; "estoque já consumido" bloqueia | RN-DOC-07 | I | pendente |
-| DOC-14 | Visualizar documento (itens, totais, financeiro) | §5 | E, G | pendente |
-| DOC-15 | Vendedor do documento: escolhe quem vê tudo; fixo no usuário para os demais; erro sem vínculo | RN-DOC-08 | I | pendente |
+| DOC-01 | Lista de documentos com filtros tipo/período e escopo de vendedor; aviso "só minhas vendas" | §1, RN-ESCOPO | I, E, G | feito (I ✔ + G ✔: filtros de tipo e período, ordem, escopo do vendedor; falta E) |
+| DOC-02 | Novo documento: COMPRA, VENDA, ENTRADA, SAIDA; pessoa, data, itens (produto, qtd, valor, unidade, profissional), forma, parcelas, 1º vencimento, categoria, vendedor, segmento | RN-DOC-01 | I, E, G | feito (I ✔ + G ✔ 164 passos: os 4 tipos, itens com unidade, financeiro, vendedor e segmento; falta E) |
+| DOC-03 | Classificação obrigatória em ENTRADA/SAIDA (AJUSTE/TRANSFERENCIA/QUEBRA); QUEBRA só em SAIDA | RN-DOC-02 | U, I | feito (I ✔ + G ✔; sem teste U separado, a regra mora no pacote `documentos`) |
+| DOC-04 | Item: qtd ≥ 0,001, valor ≥ 0,01, total = qtd × valor, `docto_valor` = soma ⚠ D-05 | RN-DOC-03 | U, I, G | testado (U ✔ + I ✔ + G ✔: total sem arredondar e gravado uma vez, também no estado final do banco) |
+| DOC-05 | Segmento do documento (escolhido ou o do item de maior valor; nenhum = Geral) | RN-DOC-04 | U, I | feito (I ✔ + G ✔: segmento escolhido, herdado do item de maior valor, nenhum = Geral) |
+| DOC-06 | Serviços: só em venda/compra; comissão exige profissional; guarda % do momento; item não serviço sem profissional | RN-DOC-05 | U, I | feito (I ✔ + G ✔: serviço só em compra/venda, comissão exige profissional, guarda o % do momento) |
+| DOC-07 | Estoque na unidade base: `qtdBase` (3 casas), `valorBase` (4 casas HALF_UP), fator gravado no item | RN-EST-01 | U, I, G | testado (U ✔ + I ✔ + G ✔: qtdBase, valorBase e fator gravado, conferidos linha a linha no estado do banco) |
+| DOC-08 | **Custo médio ponderado** na entrada (4 casas HALF_UP); saída não altera custo; custo 0 se saldo ≤ 0 | RN-EST-02/03 | U, I, G | testado (U ✔ + I ✔ + G ✔: custo médio ponderado, saída sem mexer no custo) |
+| DOC-09 | Saída bloqueia estoque insuficiente (mensagem "Disponível | Solicitado"); estoque nunca negativo | RN-EST-03 | U, I, C | feito (I ✔ + G ✔: mensagem "Disponível | Solicitado" e itens do mesmo produto que juntos passam do saldo; falta C da API) |
+| DOC-10 | Serviço não movimenta estoque | RN-EST-04 | U, I | feito (I ✔ + G ✔; sem teste U separado) |
+| DOC-11 | Salvar tudo na mesma transação (estoque + títulos); falha desfaz tudo | RN-DOC-06 | I | testado (I ✔ + G ✔: falha depois de gravar desfaz tudo e queima os códigos; estado do banco igual ao antigo) |
+| DOC-12 | Editar documento: refaz financeiro e estoque (reversão, validação de saldo, bloqueio por baixa manual/conciliada) | RN-DOC-07 | I, G | testado (I ✔ + G ✔: refaz estoque e títulos; baixa manual e conciliada bloqueiam, estas duas só com I) |
+| DOC-13 | Excluir documento: reverte estoque e financeiro; "estoque já consumido" bloqueia | RN-DOC-07 | I | testado (I ✔ + G ✔: reverte estoque e financeiro; "estoque já consumido" bloqueia) |
+| DOC-14 | Visualizar documento (itens, totais, financeiro) | §5 | E, G | feito (G ✔; falta E) |
+| DOC-15 | Vendedor do documento: escolhe quem vê tudo; fixo no usuário para os demais; erro sem vínculo | RN-DOC-08 | I | testado (I ✔: quem vê tudo escolhe o vendedor; os demais ficam no próprio, travado; sem vínculo recusa) |
 | DOC-16 | Lançar venda a partir da agenda (`/documentos/novo?agendamentoId=`, liga e conclui) | RN-DOC-09 | I, E | pendente |
-| DOC-17 | Tela de estoque (saldo, custo, filtro baixo ≤ 5, valor total) | RN-EST-05 | I, E, G | pendente |
+| DOC-17 | Tela de estoque (saldo, custo, filtro baixo ≤ 5, valor total) | RN-EST-05 | I, E, G | feito (I ✔ + G ✔: saldo, custo médio e valor em estoque com o arredondamento HALF_EVEN do Java; falta E) |
 | DOC-18 | Relatório de estoque (todos/baixo/zerado) | §1 | I, G | pendente |
 | DOC-19 | Relatório de documentos (tipo/período, total, escopo) | §1 | I, G | pendente |
 | DOC-20 | Relatório de lucratividade (qtd, venda, custo médio, lucro; exige VENDAS_TODOS) | §1 | I, G | pendente |
@@ -98,16 +98,16 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 
 | ID | Funcionalidade | Referência | Testes | Status |
 |---|---|---|---|---|
-| FIN-01 | Venda → títulos a receber; compra → a pagar; forma obrigatória/ativa/da natureza certa; baixa automática exige conta | RN-FIN-01 | U, I, G | pendente |
-| FIN-02 | Parcelas: ROUND_DOWN + resto na última; vencimentos por dias; competência dia 1; descrição "Venda #N — Pessoa" | RN-FIN-02 | U, I, G | pendente (regra U ✔) |
-| FIN-03 | Categoria do título (escolhida → maior soma do produto → do sistema); segmento do documento | RN-FIN-03 | U, I | pendente |
-| FIN-04 | Baixa automática pela forma de pagamento (dinheiro/PIX) | RN-FIN-04 | I, G | pendente |
-| FIN-05 | Baixa manual: parcial, juros, multa, desconto, conta ativa, validações, movimento no extrato, status | RN-BAIXA-01 | U, I, G | pendente (regra U ✔) |
+| FIN-01 | Venda → títulos a receber; compra → a pagar; forma obrigatória/ativa/da natureza certa; baixa automática exige conta | RN-FIN-01 | U, I, G | feito (I ✔ + G ✔ estado do banco: títulos de venda e compra, forma obrigatória/ativa/da natureza, baixa automática exige conta; sem teste U separado) |
+| FIN-02 | Parcelas: ROUND_DOWN + resto na última; vencimentos por dias; competência dia 1; descrição "Venda #N — Pessoa" | RN-FIN-02 | U, I, G | testado (U ✔ + I ✔ + G ✔: parcelas sobre o total sem arredondar, resto na última, vencimentos, competência, descrição) |
+| FIN-03 | Categoria do título (escolhida → maior soma do produto → do sistema); segmento do documento | RN-FIN-03 | U, I | feito (I ✔ + G ✔: categoria escolhida, a de maior soma do cadastro dos itens, a do sistema; segmento do documento) |
+| FIN-04 | Baixa automática pela forma de pagamento (dinheiro/PIX) | RN-FIN-04 | I, G | testado (I ✔ + G ✔: baixa automática lança baixa e movimento no extrato) |
+| FIN-05 | Baixa manual: parcial, juros, multa, desconto, conta ativa, validações, movimento no extrato, status | RN-BAIXA-01 | U, I, G | pendente (a baixa interna e as validações já existem em `internal/financeiro`, usadas pela baixa automática; falta a tela da baixa manual) |
 | FIN-06 | Baixa em lote (saldo total, forma do título) | RN-BAIXA-01 | I | pendente |
-| FIN-07 | **Taxa de cartão** vira título de despesa baixado; mensagem "Taxa de R$ x lançada como despesa." | RN-BAIXA-02 | U, I, G | pendente (regra U ✔) |
+| FIN-07 | **Taxa de cartão** vira título de despesa baixado; mensagem "Taxa de R$ x lançada como despesa." | RN-BAIXA-02 | U, I, G | feito (U ✔ + I ✔: taxa vira título PAGAR baixado e `bx_taxa`; o golden fica para o cadastro das formas, que no antigo só se cria pela tela do financeiro) |
 | FIN-08 | Estornar baixa (bloqueio por conciliação, desfaz taxa, recalcula status) | RN-ESTORNO | I, G | pendente |
 | FIN-09 | Cancelar título (só sem baixa; taxa não cancela direto) | RN-ESTORNO | I | pendente |
-| FIN-10 | Remoção de títulos ao editar/excluir documento (baixa automática some; manual/conciliada bloqueia) | RN-FIN-05 | I | pendente |
+| FIN-10 | Remoção de títulos ao editar/excluir documento (baixa automática some; manual/conciliada bloqueia) | RN-FIN-05 | I | testado (I ✔ + G ✔: apaga títulos, taxa, baixas automáticas e movimentos; baixa manual e conciliada bloqueiam) |
 | FIN-11 | Título avulso: novo/editar, parcelas 1–60, `repetir`/`dividir`, mês a mês, segmento opcional, só sem baixa edita | RN-FIN-AV | U, I, G | pendente |
 | FIN-12 | Lista de títulos: filtros natureza/status (abertos, vencidos, baixados, cancelados, todos)/período/busca; detalhe com baixas | §1 | I, E, G | pendente |
 | FIN-13 | Contas: CRUD, status, excluir com bloqueios, saldo atual e conciliado | RN-CAD, RN-CONC | I, E | pendente |

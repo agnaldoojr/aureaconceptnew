@@ -26,6 +26,10 @@ function atributos(texto) {
     const nome = m[1].toLowerCase();
     // atributos booleanos: checked, selected, required, readonly, hidden, disabled
     if (['checked', 'selected', 'required', 'readonly', 'hidden', 'disabled'].includes(nome)) v = nome;
+    // JSON dentro de atributo: o Jackson do antigo escreve as chaves de um Map.of em ordem aleatória a cada execução; compara pelo conteúdo
+    if (nome === 'data-unidades') {
+      try { v = JSON.stringify(JSON.parse(v), (_, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => (a < b ? -1 : 1))) : x)); } catch { /* fica como veio */ }
+    }
     out.push(`${nome}="${v.replace(/\s+/g, ' ').trim()}"`);
   }
   return out.sort();

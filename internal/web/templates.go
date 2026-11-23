@@ -8,6 +8,7 @@ import (
 
 	ativos "github.com/agnaldoojr/aureaconceptnew/web"
 
+	"github.com/agnaldoojr/aureaconceptnew/internal/dominio"
 	"github.com/agnaldoojr/aureaconceptnew/internal/permissoes"
 )
 
@@ -36,6 +37,8 @@ func (s *Servidor) funcoes() template.FuncMap {
 		},
 		"contains":            strings.Contains,
 		"igualIgnorandoCaixa": strings.EqualFold,
+		"dec2":                func(v int64) string { return dominio.Escala(v, 2) },
+		"brl2":                func(v int64) string { return dominio.FormatarBR64(v, 2, 2) },
 	}
 }
 

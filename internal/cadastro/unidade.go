@@ -6,20 +6,18 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 
 	"github.com/agnaldoojr/aureaconceptnew/internal/db"
+	"github.com/agnaldoojr/aureaconceptnew/internal/msg"
 )
 
-// ErroRegra é um erro de regra de negócio: a mensagem vai direto para o usuário (flash "erro").
-type ErroRegra string
+// ErroRegra é o erro de regra de negócio compartilhado (msg.Erro): a mensagem vai direto para o usuário (flash "erro").
+type ErroRegra = msg.Erro
 
-func (e ErroRegra) Error() string { return string(e) }
-
-func regra(f string, a ...any) error { return ErroRegra(fmt.Sprintf(f, a...)) }
+func regra(f string, a ...any) error { return msg.Novo(f, a...) }
 
 // Repo reúne o acesso ao banco dos cadastros: leituras no pool de leitura, gravações na conexão de escrita (em transação).
 type Repo struct{ B *db.Banco }

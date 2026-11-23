@@ -32,6 +32,12 @@ function criarRegistro(c) {
   };
   ajudas.seguir = (nome, caminho, opcoes) => ajudas.passo(nome, () => c.req(caminho), opcoes);
   ajudas.post = (nome, caminho, form, opcoes) => ajudas.passo(nome, () => c.req(caminho, { method: 'POST', form }), opcoes);
+  // posta e, se vier redirecionamento, abre a tela de destino (onde aparece a mensagem de uma só leitura)
+  ajudas.postVer = async (nome, caminho, form, opcoes) => {
+    const r = await ajudas.post(nome, caminho, form, opcoes);
+    if (r.status === 302 && r.loc) await ajudas.seguir(`  ↳ ${nome}: tela de destino`, new URL(r.loc, 'http://x').pathname + new URL(r.loc, 'http://x').search, opcoes);
+    return r;
+  };
   return ajudas;
 }
 

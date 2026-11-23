@@ -1,0 +1,72 @@
+{{define "conteudo"}}
+<div class="page-header">
+    <h1 class="page-title"><span class="page-title-icon">◆</span>
+        Documento #<span>{{.Dados.Doc.Codigo}}</span>
+    </h1>
+    <div>
+        <a href="/documentos" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Voltar</a>
+    </div>
+</div>
+
+<div class="form-card">
+    <div class="doc-header-info">
+        <div class="doc-info-item">
+            <span class="doc-info-label">Tipo</span>
+            <span class="badge {{if .Dados.Vermelho}}badge-red{{else}}badge-green{{end}}" style="font-size:1rem;padding:.4rem .9rem">{{.Dados.Doc.Tipo}}</span>
+        </div>
+        <div class="doc-info-item">
+            <span class="doc-info-label">Data</span>
+            <strong>{{.Dados.Data}}</strong>
+        </div>
+        <div class="doc-info-item">
+            <span class="doc-info-label">Pessoa</span>
+            <strong>{{.Dados.Doc.PessoaNome}}</strong>
+        </div>
+        {{if .Dados.TemVendedor}}<div class="doc-info-item">
+            <span class="doc-info-label">Vendedor</span>
+            <strong>{{.Dados.Doc.VendedorNome}}</strong>
+        </div>{{end}}
+        <div class="doc-info-item">
+            <span class="doc-info-label">Emitido por</span>
+            <strong>{{.Dados.Doc.UsuarioNome}}</strong>
+        </div>
+        <div class="doc-info-item">
+            <span class="doc-info-label">Valor Total</span>
+            <strong class="text-accent" style="font-size:1.25rem">{{.Dados.Total}}</strong>
+        </div>
+    </div>
+
+    <div class="section-divider">Itens</div>
+
+    <table class="data-table">
+        <thead>
+            <tr><th>#</th><th>Produto</th><th>Und.</th><th>Quantidade</th><th>Valor Unit.</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+            {{range .Dados.Itens}}<tr>
+                <td>{{.N}}</td>
+                <td>
+                    <span>{{.Produto}}</span>
+                    {{if .TemProf}}<small class="text-muted" style="display:block">
+                        <i class="fas fa-scissors"></i> <span>{{.Profissional}}</span>
+                        {{if .TemComissao}}<span>{{.Comissao}}</span>{{end}}
+                    </small>{{end}}
+                </td>
+                <td>
+                    <span>{{.Und}}</span>
+                    {{if .TemBase}}<small class="text-muted">{{.Base}}</small>{{end}}
+                </td>
+                <td>{{.Qtd}}</td>
+                <td>{{.Valor}}</td>
+                <td>{{.Total}}</td>
+            </tr>{{end}}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="text-align:right"><strong>Total:</strong></td>
+                <td><strong class="text-accent">{{.Dados.Total}}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{{end}}

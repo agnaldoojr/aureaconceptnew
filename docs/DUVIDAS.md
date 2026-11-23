@@ -112,3 +112,11 @@ Com a opção que você escolheu (corrigir): produto **sem documento e sem saldo
 
 ### D-20 · Permissões valem na hora (decidido, consequência de T-21)
 No antigo uma mudança de permissão só valia no **próximo login** do usuário (as autoridades ficavam congeladas na sessão); por isso as telas diziam "valem a partir do próximo login". No novo as permissões são lidas do banco a cada clique (T-21), então valem **na hora** e os três textos (aviso da tela, mensagem de "perfil aplicado" e de "permissões salvas") foram ajustados para dizer isso. Se preferir o comportamento antigo (permissão congelada até o próximo login), é uma mudança pequena, mas ela perde a vantagem de cortar o acesso de quem foi desligado.
+
+### D-21 · Venda com total de fração de centavo falhava em PIX/Dinheiro no antigo — **corrigido** (decidido, avise se quiser o contrário)
+- **O que achei (e confirmei rodando o antigo):** uma venda cujo total tem fração de centavo que arredonda **para cima** (ex.: 0,5 × R$ 9,99 = 4,995; 0,3 × 3,33 = 0,999) numa forma de **baixa automática** (Dinheiro, PIX) dá erro: *"O valor da baixa (R$ 5.00) é maior que o saldo do título (R$ 4.995)."*, e a venda não é lançada. Se arredondar para baixo (2,5025) ou se a forma for de boleto/cartão, funciona. A causa é que o antigo arredonda o valor da baixa mas compara com o saldo ainda sem arredondar.
+- **O que o novo faz:** a venda é lançada e o título já fica com o valor arredondado (R$ 5,00, baixado). A conta das **parcelas** continua como no antigo (divide o total exato, a última leva o resto, cada parcela é gravada arredondada).
+- **Como o golden trata:** o passo está marcado como "diferença decidida (D-21)" e é desfeito no fim do roteiro para o estado do banco continuar comparável. Se preferir manter o comportamento antigo, é pouco código, mas ele barra vendas legítimas de produtos vendidos por peso/metro.
+
+### D-22 · "Lançar venda a partir da agenda" ainda não existe no documento
+O formulário de documento do antigo aceita `?agendamentoId=` (pré-preenche a venda do atendimento e o conclui). Isso depende do módulo da **Agenda**, que ainda não foi migrado; a rota `/documentos/novo?agendamentoId=` por enquanto ignora o parâmetro. Entra junto com a Agenda (DOC-16).

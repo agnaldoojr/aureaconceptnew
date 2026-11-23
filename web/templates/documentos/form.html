@@ -1,0 +1,438 @@
+{{define "cabeca"}}
+<style>
+.items-table th, .items-table td { padding: .6rem 1rem; }
+</style>
+{{end}}
+{{define "conteudo"}}
+<div class="page-header">
+    <h1 class="page-title"><span class="page-title-icon">◆</span> <span>{{.Titulo}}</span></h1>
+    <a href="/documentos" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Voltar</a>
+</div>
+
+<form action="/documentos/salvar" method="post" id="formDocumento" class="form-styled">
+    <input type="hidden" name="_csrf" value="{{.CSRF}}"/>
+    <input type="hidden" name="doctoCodigo" value="{{.Dados.Doc.Codigo}}"/>
+    <!-- CABEÇALHO DO DOCUMENTO -->
+    <div class="form-card">
+        <div class="section-title">Dados do Documento</div>
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label class="form-label required">Tipo</label>
+                <select name="doctoTipo" class="form-control" required="required">
+                    <option value="">Selecione...</option>
+                    <option value="COMPRA"{{if eq .Dados.Doc.Tipo "COMPRA"}} selected="selected"{{end}}>Compra</option>
+                    <option value="VENDA"{{if eq .Dados.Doc.Tipo "VENDA"}} selected="selected"{{end}}>Venda</option>
+                    <option value="ENTRADA"{{if eq .Dados.Doc.Tipo "ENTRADA"}} selected="selected"{{end}}>Entrada</option>
+                    <option value="SAIDA"{{if eq .Dados.Doc.Tipo "SAIDA"}} selected="selected"{{end}}>Saída</option>
+                </select>
+            </div>
+            <div class="form-group col-4">
+                <label class="form-label required">Data</label>
+                <input type="date" name="doctoData" class="form-control" value="{{.Dados.Doc.Data}}" required="required"/>
+            </div>
+            <div class="form-group col-4">
+                <label class="form-label required">Pessoa</label>
+                <select name="pessoa.upsCodigo" class="form-control" required="required">
+                    <option value="">Selecione...</option>
+                    {{range .Dados.Pessoas}}<option value="{{.ID}}"{{if eq .ID $.Dados.Doc.PessoaSel}} selected="selected"{{end}}>{{.Nome}}</option>{{end}}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label class="form-label">Segmento</label>
+                <select name="segmentoId" class="form-control">
+                    <option value="">Automático (pelo produto de maior valor)</option>
+                    {{range .Dados.Segmentos}}<option value="{{.Codigo}}"{{if eq .Codigo $.Dados.Doc.SegmentoSel}} selected="selected"{{end}}>{{.Nome}}</option>{{end}}
+                </select>
+            </div>
+            <div class="form-group col-4">
+                <label class="form-label">Vendedor</label>
+                <select name="vendedorId" class="form-control"{{if .Dados.VendedorTravado}} disabled="disabled" title="Seu usuário só lança documentos no seu próprio nome."{{end}}>
+                    <option value="">— nenhum —</option>
+                    {{range .Dados.Vendedores}}<option value="{{.Codigo}}"{{if eq .Codigo $.Dados.Doc.VendedorSel}} selected="selected"{{end}}>{{.Nome}}</option>{{end}}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINANCEIRO (compra e venda geram título) -->
+    <div class="form-card" id="cardFinanceiro" style="margin-top:1.5rem;display:none">
+        <div class="section-title">Financeiro</div>
+        {{if .Dados.Fin.TemBaixaManual}}<div class="info-banner">
+            <i class="fas fa-triangle-exclamation"></i>
+            <span>Este documento tem baixa lançada manualmente no financeiro. Estorne a baixa antes de alterá-lo.</span>
+        </div>{{end}}
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label class="form-label required">Forma de pagamento</label>
+                <select name="fpgCodigo" id="fpgCodigo" class="form-control" required="required" onchange="aoTrocarForma()">
+                    <option value="">Selecione...</option>
+                    {{range .Dados.Formas}}<option value="{{.ID}}" data-natureza="{{.Natureza}}" data-parcelas="{{.PermiteParcelas}}" data-max="{{.MaxParcelas}}" data-dias="{{.DiasVenc}}" data-intervalo="{{.Intervalo}}" data-auto="{{.BaixaAutomatica}}" data-taxa="{{dec2 .TaxaCent}}" data-conta="{{.Conta}}"{{if .TemNomeBaixa}} data-baixa="{{.NomeBaixa}}"{{end}}{{if and $.Dados.Fin.Existe (eq .ID $.Dados.Fin.FpgSel)}} selected="selected"{{end}}>{{.Nome}}</option>{{end}}
+                </select>
+            </div>
+            <div class="form-group col-4">
+                <label class="form-label">Parcelas</label>
+                <input type="number" name="parcelas" id="parcelas" class="form-control" min="1" step="1"
+                       value="{{.Dados.Fin.Parcelas}}" onchange="atualizarInfoForma()"/>
+            </div>
+            <div class="form-group col-4">
+                <label class="form-label">1º vencimento</label>
+                <input type="date" name="primeiroVencimento" id="primeiroVencimento" class="form-control"
+                       value="{{.Dados.Fin.PrimeiroVenc}}" oninput="vencimentoManual = true"/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label class="form-label">Categoria financeira</label>
+                <select name="catCodigo" id="catCodigo" class="form-control">
+                    <option value="">Automática (pelo cadastro dos itens)</option>
+                    {{range .Dados.Categorias}}<option value="{{.ID}}"{{if and $.Dados.Fin.Existe (eq .ID $.Dados.Fin.CatSel)}} selected="selected"{{end}}>{{.Nome}} ({{.Tipo}})</option>{{end}}
+                </select>
+            </div>
+        </div>
+        <div id="infoForma" class="text-muted" style="font-size:.85rem;margin-top:.25rem"></div>
+    </div>
+
+    <!-- CLASSIFICAÇÃO (entrada e saída não geram título) -->
+    <div class="form-card" id="cardClassificacao" style="margin-top:1.5rem;display:none">
+        <div class="section-title">Classificação do movimento de estoque</div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label class="form-label required">Classificação</label>
+                <select name="doctoClassificacao" id="doctoClassificacao" class="form-control" required="required">
+                    <option value="">Selecione...</option>
+                    <option value="AJUSTE"{{if eq .Dados.Doc.Classificacao "AJUSTE"}} selected="selected"{{end}}>Ajuste de estoque</option>
+                    <option value="TRANSFERENCIA"{{if eq .Dados.Doc.Classificacao "TRANSFERENCIA"}} selected="selected"{{end}}>Transferência</option>
+                    <option value="QUEBRA"{{if eq .Dados.Doc.Classificacao "QUEBRA"}} selected="selected"{{end}}>Quebra (perda)</option>
+                </select>
+                <small class="text-muted">Entradas e saídas assim não geram título no financeiro. A quebra (só em saída) entra na DRE como perda de estoque.</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ITENS DO DOCUMENTO -->
+    <div class="form-card" style="margin-top:1.5rem">
+        <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Itens do Documento</span>
+            <button type="button" class="btn btn-outline btn-sm" onclick="adicionarItem()">
+                <i class="fas fa-plus"></i> Adicionar Item
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table items-table" id="tabelaItens">
+                <thead>
+                    <tr>
+                        <th style="min-width:230px">Produto</th>
+                        <th style="width:110px">Unidade</th>
+                        <th style="width:100px">Quantidade</th>
+                        <th style="width:120px">Valor Unit. (R$)</th>
+                        <th style="width:160px" title="Só para serviços do salão: quem atendeu (comissão)">Profissional</th>
+                        <th style="width:110px">Total (R$)</th>
+                        <th style="width:60px"></th>
+                    </tr>
+                </thead>
+                <tbody id="itensBody">
+                <!-- Quando EDITANDO: renderiza os itens já salvos -->
+                {{range $item := .Dados.Itens}}<tr class="item-row">
+                    <td>
+                        <select name="produtoIds" class="form-control produto-select" onchange="preencherPreco(this)" required="required">
+                            <option value="">Selecione o produto...</option>
+                            {{range $.Dados.Produtos}}<option value="{{.ID}}" data-preco="{{dec2 .PrecoCent}}" data-und="{{.Und}}" data-unidades="{{.UnidadesJSON}}" data-servico="{{.Servico}}"{{if eq .ID $item.ProdutoSel}} selected="selected"{{end}}>{{.Nome}} ({{.Und}})  — R$ {{brl2 .PrecoCent}}</option>{{end}}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="unidades" class="form-control und-select" onchange="trocarUnidade(this)" data-unidade="{{$item.Sigla}}">
+                            <option value="">—</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="quantidades" class="form-control qtd-input"
+                               step="0.001" min="0.001" value="{{$item.Qtd}}" required="required" onchange="calcularTotal(this)"/></td>
+                    <td><input type="number" name="valores" class="form-control vlr-input"
+                               step="0.01" min="0.01" value="{{$item.Valor}}" required="required" onchange="calcularTotal(this)"/></td>
+                    <td>
+                        <select name="profissionalIds" class="form-control prof-select"{{if $.Dados.VendedorTravado}} disabled="disabled"{{end}}>
+                            <option value="">—</option>
+                            {{range $.Dados.Vendedores}}<option value="{{.Codigo}}"{{if eq .Codigo $item.ProfSel}} selected="selected"{{end}}>{{.Nome}}</option>{{end}}
+                        </select>
+                    </td>
+                    <td><span class="total-item fw-500">{{$item.Total}}</span></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-delete" onclick="removerItem(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </td>
+                </tr>{{end}}
+
+                <!-- Quando NOVO: uma linha em branco inicial -->
+                {{if not .Dados.Itens}}<tr class="item-row">
+                    <td>
+                        <select name="produtoIds" class="form-control produto-select" onchange="preencherPreco(this)" required="required">
+                            <option value="">Selecione o produto...</option>
+                            {{range .Dados.Produtos}}<option value="{{.ID}}" data-preco="{{dec2 .PrecoCent}}" data-und="{{.Und}}" data-unidades="{{.UnidadesJSON}}" data-servico="{{.Servico}}">{{.Nome}} ({{.Und}})  — R$ {{brl2 .PrecoCent}}</option>{{end}}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="unidades" class="form-control und-select" onchange="trocarUnidade(this)">
+                            <option value="">—</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="quantidades" class="form-control qtd-input"
+                               step="0.001" min="0.001" value="1" required="required" onchange="calcularTotal(this)"/></td>
+                    <td><input type="number" name="valores" class="form-control vlr-input"
+                               step="0.01" min="0.01" value="0" required="required" onchange="calcularTotal(this)"/></td>
+                    <td>
+                        <select name="profissionalIds" class="form-control prof-select"{{if .Dados.VendedorTravado}} disabled="disabled"{{end}}>
+                            <option value="">—</option>
+                            {{range .Dados.Vendedores}}<option value="{{.Codigo}}">{{.Nome}}</option>{{end}}
+                        </select>
+                    </td>
+                    <td><span class="total-item fw-500">R$ 0,00</span></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-delete" onclick="removerItem(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </td>
+                </tr>{{end}}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" style="text-align:right"><strong>Valor Total do Documento:</strong></td>
+                        <td><span id="totalGeral" class="fw-500 text-accent">R$ 0,00</span></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a href="/documentos" class="btn btn-cancel"><i class="fas fa-times"></i> Cancelar</a>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Documento</button>
+    </div>
+</form>
+{{end}}
+{{define "scripts"}}
+<script>
+// Referência ao select de produtos para clonar
+const produtoOptions = document.querySelector('select[name="produtoIds"]').innerHTML;
+// opções de profissional para linhas novas (sem a opção marcada de uma linha já salva)
+const profOptions = document.querySelector('select[name="profissionalIds"]').innerHTML
+    .replace(/ selected(="selected")?/g, '');
+
+// Profissional só aparece para serviço; ao escolher um serviço, já vem o vendedor do documento
+function ehServico(row) {
+    const s = row.querySelector('.produto-select');
+    const o = s.options[s.selectedIndex];
+    return !!o && o.getAttribute('data-servico') === 'true';
+}
+function ajustarProfissional(row) {
+    const sel = row.querySelector('.prof-select');
+    if (!sel) return;
+    if (ehServico(row)) {
+        sel.style.display = '';
+        if (!sel.value) {
+            const v = document.querySelector('select[name="vendedorId"]');
+            if (v && v.value) sel.value = v.value;
+        }
+    } else {
+        sel.value = '';
+        sel.style.display = 'none';
+    }
+}
+
+function adicionarItem() {
+    const tbody = document.getElementById('itensBody');
+    const row = document.createElement('tr');
+    row.className = 'item-row';
+    row.innerHTML = `
+        <td><select name="produtoIds" class="form-control produto-select" onchange="preencherPreco(this)" required>
+            ${produtoOptions}
+        </select></td>
+        <td><select name="unidades" class="form-control und-select" onchange="trocarUnidade(this)"><option value="">—</option></select></td>
+        <td><input type="number" name="quantidades" class="form-control qtd-input" step="0.001" min="0.001" value="1" required onchange="calcularTotal(this)"/></td>
+        <td><input type="number" name="valores" class="form-control vlr-input" step="0.01" min="0.01" value="0" required onchange="calcularTotal(this)"/></td>
+        <td><select name="profissionalIds" class="form-control prof-select" style="display:none"
+                    ${document.querySelector('select[name="vendedorId"]').disabled ? 'disabled' : ''}>${profOptions}</select></td>
+        <td><span class="total-item fw-500">R$ 0,00</span></td>
+        <td><button type="button" class="btn btn-sm btn-delete" onclick="removerItem(this)"><i class="fas fa-times"></i></button></td>
+    `;
+    tbody.appendChild(row);
+}
+
+function removerItem(btn) {
+    const rows = document.querySelectorAll('.item-row');
+    if (rows.length <= 1) { alert('O documento deve ter pelo menos um item.'); return; }
+    btn.closest('tr').remove();
+    atualizarTotal();
+}
+
+// Dados do produto escolhido na linha: unidade base, preço base e as outras unidades (com fator e preço sugerido)
+function dadosProduto(row) {
+    const select = row.querySelector('.produto-select');
+    const opt = select.options[select.selectedIndex];
+    let outras = [];
+    try { outras = JSON.parse(opt.getAttribute('data-unidades') || '[]'); } catch (e) { outras = []; }
+    return {
+        base: opt.getAttribute('data-und') || '',
+        precoBase: parseFloat(opt.getAttribute('data-preco') || '0') || 0,
+        outras: outras
+    };
+}
+
+// Monta as opções de unidade da linha: a base e as outras do produto (mostra o fator, ex.: "CX (12 UN)")
+function montarUnidades(row, selecionada) {
+    const dados = dadosProduto(row);
+    const sel = row.querySelector('.und-select');
+    sel.innerHTML = '';
+    const add = (sigla, rotulo) => {
+        const o = document.createElement('option');
+        o.value = sigla; o.textContent = rotulo; sel.appendChild(o);
+    };
+    if (!dados.base) { add('', '—'); return; }
+    add(dados.base, dados.base);
+    dados.outras.forEach(u => add(u.sigla, u.sigla + ' (' + Number(u.fator) + ' ' + dados.base + ')'));
+    if (selecionada) {
+        let achou = Array.from(sel.options).find(o => o.value.toUpperCase() === selecionada.toUpperCase());
+        if (!achou) { add(selecionada, selecionada + ' (não cadastrada)'); achou = sel.lastElementChild; }
+        sel.value = achou.value;
+    }
+}
+
+function precoDaUnidade(row) {
+    const dados = dadosProduto(row);
+    const sigla = (row.querySelector('.und-select').value || '').toUpperCase();
+    const u = dados.outras.find(x => x.sigla.toUpperCase() === sigla);
+    return u ? u.preco : dados.precoBase;
+}
+
+function preencherPreco(select) {
+    const row = select.closest('tr');
+    montarUnidades(row, null);
+    row.querySelector('.vlr-input').value = precoDaUnidade(row);
+    ajustarProfissional(row);
+    calcularTotal(select);
+}
+
+function trocarUnidade(sel) {
+    const row = sel.closest('tr');
+    row.querySelector('.vlr-input').value = precoDaUnidade(row);
+    calcularTotal(sel);
+}
+
+// Linhas já salvas (edição): monta as unidades mantendo a escolhida e o valor gravado
+document.querySelectorAll('.item-row').forEach(row => {
+    const sel = row.querySelector('.und-select');
+    if (sel && row.querySelector('.produto-select').value) montarUnidades(row, sel.dataset.unidade || null);
+    ajustarProfissional(row);
+});
+atualizarTotal();   // total geral já na abertura (edição ou venda vinda da agenda)
+
+function calcularTotal(el) {
+    const row = el.closest('tr');
+    const qtd = parseFloat(row.querySelector('.qtd-input').value) || 0;
+    const vlr = parseFloat(row.querySelector('.vlr-input').value) || 0;
+    const total = qtd * vlr;
+    row.querySelector('.total-item').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+    atualizarTotal();
+}
+
+function atualizarTotal() {
+    let soma = 0;
+    document.querySelectorAll('.total-item').forEach(el => {
+        soma += parseFloat(el.textContent.replace('R$ ','').replace(',','.')) || 0;
+    });
+    document.getElementById('totalGeral').textContent = 'R$ ' + soma.toFixed(2).replace('.', ',');
+}
+
+// Preenche preço ao selecionar produto na linha inicial
+document.querySelector('.produto-select').addEventListener('change', function() {
+    preencherPreco(this);
+});
+
+// ───────── Financeiro do documento ─────────
+let vencimentoManual = false;
+const selTipo = document.querySelector('select[name="doctoTipo"]');
+const inData = document.querySelector('input[name="doctoData"]');
+const selForma = document.getElementById('fpgCodigo');
+const inParcelas = document.getElementById('parcelas');
+const inVenc = document.getElementById('primeiroVencimento');
+
+function natureza(tipo) { return tipo === 'VENDA' ? 'RECEBER' : (tipo === 'COMPRA' ? 'PAGAR' : null); }
+function habilitar(bloco, ligado) {
+    bloco.querySelectorAll('input, select').forEach(el => el.disabled = !ligado);
+}
+function somarDias(isoData, dias) {
+    if (!isoData) return '';
+    const d = new Date(isoData + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + dias);
+    return d.toISOString().slice(0, 10);
+}
+function brl(v) { return Number(v).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+
+function aoTipoTrocado() {
+    const tipo = selTipo.value, nat = natureza(tipo);
+    const cardFin = document.getElementById('cardFinanceiro');
+    const cardCls = document.getElementById('cardClassificacao');
+    cardFin.style.display = nat ? '' : 'none';
+    habilitar(cardFin, !!nat);
+    const semFin = (tipo === 'ENTRADA' || tipo === 'SAIDA');
+    cardCls.style.display = semFin ? '' : 'none';
+    habilitar(cardCls, semFin);
+
+    // só mostra as formas da natureza certa (venda = recebimento, compra = pagamento)
+    Array.from(selForma.options).forEach(o => {
+        if (!o.value) return;
+        const ok = o.dataset.natureza === nat;
+        o.hidden = !ok; o.disabled = !ok;
+    });
+    const atual = selForma.selectedOptions[0];
+    if (atual && atual.value && atual.dataset.natureza !== nat) selForma.value = '';
+
+    // quebra só vale para saída
+    const quebra = document.querySelector('#doctoClassificacao option[value="QUEBRA"]');
+    quebra.hidden = tipo !== 'SAIDA'; quebra.disabled = tipo !== 'SAIDA';
+    if (tipo !== 'SAIDA' && quebra.selected) document.getElementById('doctoClassificacao').value = '';
+
+    atualizarInfoForma();
+}
+
+function aoTrocarForma() { vencimentoManual = false; atualizarInfoForma(); }
+
+function atualizarInfoForma() {
+    const info = document.getElementById('infoForma');
+    const o = selForma.selectedOptions[0];
+    if (!natureza(selTipo.value) || !o || !o.value) { info.textContent = ''; inParcelas.disabled = false; inVenc.disabled = false; return; }
+    const auto = o.dataset.auto === 'true';
+    const parcela = o.dataset.parcelas === 'true';
+    const max = parseInt(o.dataset.max || '1', 10);
+    const dias = parseInt(o.dataset.dias || '0', 10);
+    const intervalo = parseInt(o.dataset.intervalo || '30', 10);
+    const taxa = parseFloat(o.dataset.taxa || '0');
+
+    inParcelas.max = max;
+    inParcelas.disabled = !parcela || auto;
+    if (inParcelas.disabled) inParcelas.value = 1;
+    else if (parseInt(inParcelas.value || '1', 10) > max) inParcelas.value = max;
+    inVenc.disabled = auto;
+
+    if (auto) {
+        inVenc.value = '';
+        info.textContent = 'Baixa automática na conta "' + o.dataset.conta + '"'
+            + (o.dataset.baixa ? ' (' + o.dataset.baixa + ')' : '') + ': o título já nasce baixado.';
+        return;
+    }
+    if (!vencimentoManual) inVenc.value = somarDias(inData.value, dias);
+    const n = parseInt(inParcelas.value || '1', 10);
+    let txt = 'Título em aberto' + (n > 1 ? ' em ' + n + ' parcelas, a cada ' + intervalo + ' dias' : '')
+        + ', 1º vencimento em ' + (inVenc.value ? inVenc.value.split('-').reverse().join('/') : '—') + '.';
+    if (taxa > 0) txt += ' Ao baixar, será descontada taxa de ' + brl(taxa) + '%.';
+    info.textContent = txt;
+}
+
+selTipo.addEventListener('change', aoTipoTrocado);
+inData.addEventListener('change', atualizarInfoForma);
+aoTipoTrocado();
+</script>
+{{end}}

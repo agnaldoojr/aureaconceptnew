@@ -1,3 +1,4 @@
+// DESPEJO_ESPERA: Produto, Estoque (D-03: excluir produto sem documento funciona no novo; o antigo nunca apagava)
 // Teste GOLDEN de Produtos: o mesmo roteiro no sistema antigo e no novo (ver lib/golden.mjs). Rode por `bash rodar-golden.sh comparar-produtos.mjs`.
 // Parte dos dados de exemplo do antigo: produtos 1 a 8 (UN e CJ), estoque 10 nos produtos 1 e 2, uma compra com os dois.
 import { executarGolden } from './lib/golden.mjs';
