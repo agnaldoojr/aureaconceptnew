@@ -1,0 +1,220 @@
+{{define "conteudo"}}
+<div class="page-header">
+    <h1 class="page-title">
+        <span class="page-title-icon">◆</span>
+        <span>{{.Titulo}}</span>
+    </h1>
+    <a href="/produtos" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<div class="form-card">
+    <form action="/produtos/salvar" method="post" class="form-styled">
+        <input type="hidden" name="_csrf" value="{{.CSRF}}"/>
+
+        <input type="hidden" id="uprCodigo" name="uprCodigo" value="{{.Dados.Produto.Codigo}}"/>
+
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label class="form-label">Código</label>
+                <input type="text" value="{{.Dados.Produto.Codigo}}" class="form-control" readonly="readonly"
+                       placeholder="Gerado automaticamente"/>
+            </div>
+            <div class="form-group col-8">
+                <label for="uprNome" class="form-label required">Nome do Produto</label>
+                <input type="text" id="uprNome" name="uprNome" value="{{.Dados.Produto.Nome}}" class="form-control"
+                       placeholder="Ex.: Esmalte Nude Delicado" required="required"/>
+                {{with index .Dados.Erros "uprNome"}}<span class="field-error">{{.}}</span>{{end}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="uprComplemento" class="form-label">Descrição / Complemento</label>
+            <input type="text" id="uprComplemento" name="uprComplemento" value="{{.Dados.Produto.Complemento}}" class="form-control"
+                   placeholder="Ex.: Banhado a ouro 18k, corrente fina 45cm"/>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label for="uprUnd" class="form-label required">Unidade de Medida</label>
+                <select id="uprUnd" name="uprUnd" class="form-control" required="required">
+                    <option value=""{{if .Dados.Produto.UndVazio}} selected="selected"{{end}}>Selecione...</option>
+                    {{range .Dados.Unidades}}<option value="{{.Sigla}}"{{if eq .Sigla $.Dados.Produto.Und}} selected="selected"{{end}}>{{.Sigla}} — {{.Descricao}}</option>{{end}}
+                </select>
+                {{if pode .Auth "UNIDADES_CONSULTA"}}<small class="text-muted">
+                    Falta uma? <a href="/unidades">Cadastre em Unidades de medida</a>.
+                </small>{{end}}
+                {{with index .Dados.Erros "uprUnd"}}<span class="field-error">{{.}}</span>{{end}}
+            </div>
+            <div class="form-group col-4">
+                <label for="uprPreco" class="form-label required">Preço de Venda (R$)</label>
+                <input type="number" id="uprPreco" name="uprPreco" value="{{.Dados.Produto.Preco}}" class="form-control"
+                       step="0.01" min="0.01" placeholder="0,00" required="required"/>
+                {{with index .Dados.Erros "uprPreco"}}<span class="field-error">{{.}}</span>{{end}}
+            </div>
+            <div class="form-group col-4">
+                <label class="form-label">Status</label>
+                <div class="toggle-group">
+                    <input type="checkbox" id="uprAtivo" name="uprAtivo" value="true"{{if .Dados.Produto.Ativo}} checked="checked"{{end}} class="toggle-input"/>
+                    <input type="hidden" name="_uprAtivo" value="on"/>
+                    <label for="uprAtivo" class="toggle-label">Produto ativo</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label class="form-label">Tipo</label>
+                <div class="toggle-group">
+                    <input type="checkbox" id="uprServico" name="uprServico" value="true"{{if .Dados.Produto.Servico}} checked="checked"{{end}} class="toggle-input"
+                           onchange="aoTrocarServico()"/>
+                    <input type="hidden" name="_uprServico" value="on"/>
+                    <label for="uprServico" class="toggle-label">É um serviço (sem estoque)</label>
+                </div>
+                <small class="text-muted">Corte, escova, manicure... Serviço não entra no estoque.</small>
+            </div>
+            <div class="form-group col-4" id="blocoComissao">
+                <label for="uprComissaoPerc" class="form-label">Comissão do profissional (%)</label>
+                <input type="number" id="uprComissaoPerc" name="uprComissaoPerc" value="{{.Dados.Produto.Comissao}}" class="form-control"
+                       step="0.01" min="0" max="100" placeholder="Ex.: 40"/>
+                <small class="text-muted">Percentual do valor do serviço que fica com quem atendeu. Em branco = sem comissão.</small>
+                {{with index .Dados.Erros "uprComissaoPerc"}}<span class="field-error">{{.}}</span>{{end}}
+            </div>
+            <div class="form-group col-4" id="blocoDuracao">
+                <label for="uprDuracaoMin" class="form-label">Duração (minutos)</label>
+                <input type="number" id="uprDuracaoMin" name="uprDuracaoMin" value="{{.Dados.Produto.Duracao}}" class="form-control"
+                       step="5" min="1" max="1440" placeholder="Ex.: 45"/>
+                <small class="text-muted">Usada para calcular o fim do atendimento na agenda. Em branco = 30 min.</small>
+                {{with index .Dados.Erros "uprDuracaoMin"}}<span class="field-error">{{.}}</span>{{end}}
+            </div>
+        </div>
+
+        <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Outras unidades de compra e venda</span>
+            <button type="button" class="btn btn-outline btn-sm" onclick="adicionarUn()">
+                <i class="fas fa-plus"></i> Adicionar unidade
+            </button>
+        </div>
+        <p class="text-muted" style="margin-bottom:.75rem">
+            O estoque fica sempre na <strong>Unidade de Medida</strong> acima (a unidade base). Aqui você cadastra outras unidades em que
+            compra ou vende e quantas unidades base cabem em cada uma. Ex.: base <strong>UN</strong>; <strong>CX</strong> com fator
+            <strong>12</strong> (1 CX = 12 UN): vender 1 CX baixa 12 UN do estoque. O preço da unidade é opcional
+            (sem ele, vale o preço do produto × fator).
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th style="width:240px">Unidade</th><th>Equivale a</th><th style="width:180px">Preço de venda (R$)</th><th style="width:60px"></th></tr></thead>
+                <tbody id="unBody">
+                    {{range .Dados.Linhas}}<tr class="un-row">
+                        <td>
+                            <select name="unSiglas" class="form-control">
+                                <option value="">Selecione...</option>
+                                {{$sigla := .Sigla}}{{range $.Dados.Unidades}}<option value="{{.Sigla}}"{{if igualIgnorandoCaixa $sigla .Sigla}} selected="selected"{{end}}>{{.Sigla}} — {{.Descricao}}</option>{{end}}
+                            </select>
+                        </td>
+                        <td>
+                            <span class="text-muted">1 =</span>
+                            <input type="number" name="unFatores" class="form-control" style="width:140px;display:inline-block"
+                                   step="0.000001" min="0.000001" value="{{.Fator}}" placeholder="Ex.: 12"/>
+                            <strong class="base-label"></strong>
+                        </td>
+                        <td><input type="number" name="unPrecos" class="form-control" step="0.01" min="0.01"
+                                   value="{{.Preco}}" placeholder="opcional"/></td>
+                        <td><button type="button" class="btn btn-sm btn-delete" onclick="removerUn(this)" title="Remover"><i class="fas fa-times"></i></button></td>
+                    </tr>{{end}}
+                </tbody>
+            </table>
+        </div>
+        <template id="modeloUn">
+            <tr class="un-row">
+                <td>
+                    <select name="unSiglas" class="form-control">
+                        <option value="">Selecione...</option>
+                        {{range .Dados.Unidades}}<option value="{{.Sigla}}">{{.Sigla}} — {{.Descricao}}</option>{{end}}
+                    </select>
+                </td>
+                <td>
+                    <span class="text-muted">1 =</span>
+                    <input type="number" name="unFatores" class="form-control" style="width:140px;display:inline-block"
+                           step="0.000001" min="0.000001" placeholder="Ex.: 12"/>
+                    <strong class="base-label"></strong>
+                </td>
+                <td><input type="number" name="unPrecos" class="form-control" step="0.01" min="0.01" placeholder="opcional"/></td>
+                <td><button type="button" class="btn btn-sm btn-delete" onclick="removerUn(this)" title="Remover"><i class="fas fa-times"></i></button></td>
+            </tr>
+        </template>
+
+        <div class="section-title">Financeiro</div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label for="segmentoId" class="form-label">Segmento</label>
+                <select id="segmentoId" name="segmentoId" class="form-control">
+                    <option value="">Geral (sem segmento)</option>
+                    {{range .Dados.Segmentos}}<option value="{{.Codigo}}"{{if eq .Codigo $.Dados.Produto.Segmento}} selected="selected"{{end}}>{{.Nome}}</option>{{end}}
+                </select>
+                <small class="text-muted">O documento (e o título e o DRE) herda o segmento do produto de maior valor.</small>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label for="uprCatVenda" class="form-label">Categoria de venda (receita)</label>
+                <select id="uprCatVenda" name="uprCatVenda" class="form-control">
+                    <option value="">Padrão do sistema (Venda de produtos)</option>
+                    {{range .Dados.CatReceita}}<option value="{{.Codigo}}"{{if eq .Codigo $.Dados.Produto.CatVenda}} selected="selected"{{end}}>{{.Nome}}</option>{{end}}
+                </select>
+                <small class="text-muted">Já vem preenchida no título quando este item é vendido.</small>
+            </div>
+            <div class="form-group col-6">
+                <label for="uprCatCompra" class="form-label">Categoria de compra (despesa)</label>
+                <select id="uprCatCompra" name="uprCatCompra" class="form-control">
+                    <option value="">Padrão do sistema (Compra de mercadoria)</option>
+                    {{range .Dados.CatDespesa}}<option value="{{.Codigo}}"{{if eq .Codigo $.Dados.Produto.CatCompra}} selected="selected"{{end}}>{{.Nome}}</option>{{end}}
+                </select>
+                <small class="text-muted">Já vem preenchida no título quando este item é comprado.</small>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/produtos" class="btn btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar Produto
+            </button>
+        </div>
+
+    </form>
+</div>
+
+{{end}}
+{{define "scripts"}}
+<script>
+// A comissão só faz sentido para serviço
+function aoTrocarServico() {
+    const servico = document.getElementById('uprServico').checked;
+    document.getElementById('blocoComissao').style.display = servico ? '' : 'none';
+    document.getElementById('blocoDuracao').style.display = servico ? '' : 'none';
+    if (!servico) {
+        document.getElementById('uprComissaoPerc').value = '';
+        document.getElementById('uprDuracaoMin').value = '';
+    }
+}
+aoTrocarServico();
+
+// Unidades adicionais: o texto "1 CX = [12] UN" acompanha a unidade base escolhida acima
+const selBase = document.getElementById('uprUnd');
+function atualizarBase() {
+    const base = selBase.value || 'unidade base';
+    document.querySelectorAll('.base-label').forEach(e => e.textContent = base);
+}
+function adicionarUn() {
+    const modelo = document.getElementById('modeloUn');
+    document.getElementById('unBody').appendChild(modelo.content.cloneNode(true));
+    atualizarBase();
+}
+function removerUn(btn) { btn.closest('tr').remove(); }
+selBase.addEventListener('change', atualizarBase);
+atualizarBase();
+</script>
+{{end}}

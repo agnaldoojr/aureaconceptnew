@@ -53,13 +53,13 @@ Resumo: **144 itens** em 12 áreas (mais os itens descartados da seção M). Ite
 
 | ID | Funcionalidade | Referência | Testes | Status |
 |---|---|---|---|---|
-| CAD-01 | Produtos: lista (busca só ativos, sem acento), novo, editar, validações (nome, unidade, preço ≥ 0,01, comissão, duração) | RN-PROD-01/06 | I, E, G | pendente |
-| CAD-02 | Produto: ativar/inativar; ativar com preço 0 → aviso e volta à edição | RN-PROD-05 | I | pendente |
-| CAD-03 | Produto: excluir ⚠ D-03 (hoje falha sempre com a linha de Estoque) | RN-PROD | I | pendente |
-| CAD-04 | Produto serviço: sem Estoque, só vira serviço com saldo 0, zera comissão/duração se não for serviço | RN-PROD-03 | U, I | pendente |
-| CAD-05 | Produto: unidade base válida e ativa; trocar base com extras exige remover antes | RN-PROD-02/04 | I | pendente |
-| CAD-06 | Produto: unidades extras (sigla, fator ≤ 1.000.000, preço opcional), preço sugerido por unidade | RN-UND-02 | U, I | pendente (regra U ✔) |
-| CAD-07 | Produto: categoria financeira de venda/compra, segmento | RN-FIN-03 | I | pendente |
+| CAD-01 | Produtos: lista (busca só ativos, sem acento), novo, editar, validações (nome, unidade, preço ≥ 0,01, comissão, duração) | RN-PROD-01/06 | I, E, G | feito (I ✔ + G ✔ 100 passos: lista, busca só de ativos sem acento, novo, editar, todas as validações e mensagens; falta E) |
+| CAD-02 | Produto: ativar/inativar; ativar com preço 0 → aviso e volta à edição | RN-PROD-05 | I | feito (I ✔ + G ✔; o aviso de preço zero ao ativar só tem I ✔, porque a tela não deixa criar produto com preço zero) |
+| CAD-03 | Produto: excluir ⚠ D-03 (hoje falha sempre com a linha de Estoque) | RN-PROD | I | feito (I ✔ D-03 corrigido: exclui produto sem documento, com a linha de estoque zerada e as unidades extras; com documento ou com saldo não apaga nada; G ✔ confirma a diferença decidida) |
+| CAD-04 | Produto serviço: sem Estoque, só vira serviço com saldo 0, zera comissão/duração se não for serviço | RN-PROD-03 | U, I | feito (I ✔ + G ✔; a regra mora no cadastro e não no domínio, então não tem teste U: serviço sem linha de estoque, só vira serviço com saldo zero, produto zera comissão e duração; falta E) |
+| CAD-05 | Produto: unidade base válida e ativa; trocar base com extras exige remover antes | RN-PROD-02/04 | I | feito (I ✔ + G ✔: base cadastrada e ativa, unidade inativa mantida pelo produto que já a usa, troca de base com extras exige removê-las) |
+| CAD-06 | Produto: unidades extras (sigla, fator ≤ 1.000.000, preço opcional), preço sugerido por unidade | RN-UND-02 | U, I | feito (U ✔ + I ✔ + G ✔: sigla, fator até 1.000.000 com 6 casas, preço opcional, repetida, igual à base; falta o preço sugerido por unidade, que é do documento) |
+| CAD-07 | Produto: categoria financeira de venda/compra, segmento | RN-FIN-03 | I | feito (I ✔ + G ✔: categoria de venda e compra e segmento no formulário; o uso no título e no DRE vem com os documentos) |
 | CAD-08 | Unidades de medida: CRUD, sigla única sem diferenciar maiúscula/acento, em maiúsculas, bloqueios de trocar/excluir em uso | RN-UND-01 | U, I, E | feito (I ✔ + G ✔ contra o antigo, 83 passos do roteiro; falta E; liga a Produtos quando a tela de produtos existir) |
 | CAD-09 | Pessoas: lista com busca (nome/CPF/telefone), filtro de tipo e segmento | RN-PESSOA | I, E | feito (I ✔ + G ✔: busca sem acento/maiúscula, por CPF e telefone, filtros de tipo e segmento, ordem; falta E) |
 | CAD-10 | Pessoas: novo/editar/excluir; papéis (cliente, fornecedor, vendedor, funcionário); segmentos; nascimento | §1 | I, E | feito (I ✔ + G ✔: novo, editar, excluir (com documento barra), papéis, segmentos, nascimento; falta E) |

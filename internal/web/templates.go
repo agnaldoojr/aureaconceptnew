@@ -34,7 +34,8 @@ func (s *Servidor) funcoes() template.FuncMap {
 			}
 			return iso[8:10] + "/" + iso[5:7] + "/" + iso[0:4]
 		},
-		"contains": strings.Contains,
+		"contains":            strings.Contains,
+		"igualIgnorandoCaixa": strings.EqualFold,
 	}
 }
 

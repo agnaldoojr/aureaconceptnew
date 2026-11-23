@@ -120,6 +120,7 @@ func (s *Servidor) rotas() {
 	s.mux.HandleFunc("GET /dashboard", s.dashboard)
 	s.rotasUnidades()
 	s.rotasPessoas()
+	s.rotasProdutos()
 	// as demais telas entram nas próximas fatias; até lá qualquer outro caminho (já autenticado e autorizado) é 404
 	s.mux.HandleFunc("/", s.naoEncontrado)
 }
@@ -437,6 +438,7 @@ func (s *Servidor) protegida(w http.ResponseWriter, r *http.Request) {
 // negar volta ao dashboard com a mensagem de uma só leitura.
 func (s *Servidor) negar(w http.ResponseWriter, r *http.Request, sess *Sessao, mensagem string) {
 	_ = s.sessoes.Flash(r.Context(), sess, "erro", mensagem)
+	_ = s.sessoes.DestinarFlash(r.Context(), sess, "/dashboard")
 	http.Redirect(w, r, "/dashboard", http.StatusFound)
 }
 
@@ -465,10 +467,19 @@ type Pagina struct {
 
 // tela renderiza uma página com o layout base (menu por permissão, mensagens de uma só leitura, rodapé).
 func (s *Servidor) tela(w http.ResponseWriter, r *http.Request, modelo, titulo, ativa string, dados any) {
+	s.telaComErro(w, r, modelo, titulo, ativa, dados, "")
+}
+
+// telaComErro é a tela com uma mensagem de erro própria da resposta (o formulário que volta com o que foi digitado), que
+// vale no lugar da mensagem de uma só leitura da sessão, como o `model.addAttribute("erro", ...)` do antigo.
+func (s *Servidor) telaComErro(w http.ResponseWriter, r *http.Request, modelo, titulo, ativa string, dados any, erroDireto string) {
 	c := ctxDe(r)
-	erro, sucesso, info, err := s.sessoes.LerFlash(r.Context(), c.Sessao)
+	erro, sucesso, info, err := s.sessoes.LerFlash(r.Context(), c.Sessao, r.URL.Path)
 	if err != nil {
 		s.log.Warn("ler mensagens da sessão", "erro", err)
+	}
+	if erroDireto != "" {
+		erro = erroDireto
 	}
 	p := &Pagina{
 		Titulo: titulo, PaginaAtiva: ativa, Usuario: c.Usuario.Login, Auth: c.Usuario.Auth,

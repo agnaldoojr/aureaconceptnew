@@ -63,10 +63,22 @@ O golden achou, de saída, duas coisas que os testes escritos por mim não achar
 Itens da matriz: `feito` CAD-08, CAD-09, CAD-10, CAD-11 (falta o E2E Playwright e o C da API); CAD-15 segue `pendente` (só Pessoas usa segmento por enquanto).
 **Não testado ainda:** E2E Playwright, pixel a pixel (a tela é o mesmo HTML com o mesmo CSS, mas não comparei imagens), celular real.
 
+### Fatia 5: Produtos (com unidades extras, serviços, status e exclusão corrigida)
+| Pacote / pasta | O que tem | Testes |
+|---|---|---|
+| `internal/cadastro/produto.go` | Regras do `ProdutoService` e `ProdutoUnidadeService` com as mesmas mensagens e a **mesma ordem de verificações**: validação de campos (anotações do modelo), troca de base com extras, unidade cadastrada/ativa (o produto mantém a sua mesmo inativa), serviço só com saldo zero, produto zera comissão e duração, linha de estoque criada/removida, unidades extras (repetida, igual à base, fator, preço), tudo numa transação; status (ativar exige preço ≥ 0,01); **exclusão corrigida (D-03)**; `queimarCodigo` | 13 testes de integração em `internal/web/produtos_test.go` |
+| `internal/web` (`produtos.go`, `formato.go`) | Rotas `/produtos` (lista, novo, editar, salvar, status, excluir); formulário que volta com o digitado; números como o Java imprime (`89.90`, `12.000000`) e como o Thymeleaf formata (`R$ 1.234,56`) | idem |
+| `web/templates/produtos` | Lista e formulário portados, com o JS das unidades extras do antigo | **golden contra o antigo: 100 passos, 0 divergências** |
+| `e2e/lib/golden.mjs`, `e2e/comparar-produtos.mjs` | Executor comum dos roteiros golden (aceita "diferença decidida" como a do D-03) e o roteiro de Produtos | idem |
+
+**O que o golden descobriu nesta fatia** (e eu corrigi, todos fora do que um teste feito só pela leitura do código acharia): a mensagem de uma só leitura do antigo é uma **fila amarrada ao destino** com a regra de "consumir remove os iguais" (T-27); as listas do antigo ordenam **sem acento** em todas as colunas (T-29); "Selecione…" fica marcado quando a unidade volta em branco; um produto novo que falha depois de gravado volta como "Editar Produto" com o código queimado (T-28). Esses mesmos itens valem para todas as telas seguintes.
+
+Itens da matriz: `feito` CAD-01 a CAD-07 (falta o E2E Playwright). **Diferença decidida (D-03):** excluir produto sem documento agora funciona (o antigo falhava sempre). **Não testado:** E2E Playwright, pixel a pixel, celular real; o preço sugerido por unidade (CAD-06) é do documento.
+
 ## Próximas fatias (ordem proposta)
 1. ~~Configuração por variáveis de ambiente e admin inicial~~ (feito na fatia 2).
 2. ~~Servidor HTTP: sessão, CSRF, limite de login, permissões, layout e estáticos~~ (feito na fatia 3; falta o conteúdo do dashboard).
-3. **Cadastros**: ~~unidades e pessoas~~ (fatia 4); faltam **produtos** (unidades extras, serviços, ativar/inativar, excluir D-03), **usuários** e **permissões** (perfis prontos).
+3. **Cadastros**: ~~unidades, pessoas e produtos~~ (fatias 4 e 5); faltam **usuários** e **permissões** (perfis prontos).
 4. **Documentos + estoque + financeiro** (o núcleo transacional) com os testes *golden* (`e2e/semear.mjs` nos dois sistemas).
 5. **API `/api` e `/vendedor/api`** contra `docs/referencia/api/contrato.json`.
 6. **Salão** (agenda, comissões), **metas, dashboard, BI, relatórios**.

@@ -19,21 +19,21 @@ CREATE TABLE Segmento (
 CREATE TABLE Unidade_Medida (
     und_codigo    INTEGER PRIMARY KEY AUTOINCREMENT,
     und_sigla     TEXT NOT NULL COLLATE AUREA_CIAI,
-    und_descricao TEXT NOT NULL,
+    und_descricao TEXT COLLATE AUREA_CIAI NOT NULL,
     und_ativo     INTEGER NOT NULL DEFAULT 1 CHECK (und_ativo IN (0,1)),
     CONSTRAINT UQ_Unidade_Medida_Sigla UNIQUE (und_sigla)
 );
 
 CREATE TABLE Tipo_Titulo (
     tpt_codigo   INTEGER PRIMARY KEY AUTOINCREMENT,
-    tpt_nome     TEXT NOT NULL,
+    tpt_nome     TEXT COLLATE AUREA_CIAI NOT NULL,
     tpt_natureza TEXT NOT NULL CHECK (tpt_natureza IN ('RECEBER','PAGAR')),
     tpt_ativo    INTEGER NOT NULL DEFAULT 1 CHECK (tpt_ativo IN (0,1))
 );
 
 CREATE TABLE Conta_Financeira (
     cfn_codigo        INTEGER PRIMARY KEY AUTOINCREMENT,
-    cfn_nome          TEXT NOT NULL,
+    cfn_nome          TEXT COLLATE AUREA_CIAI NOT NULL,
     cfn_tipo          TEXT NOT NULL CHECK (cfn_tipo IN ('CAIXA','BANCO','MAQUININHA','OUTRA')),
     cfn_saldo_inicial INTEGER NOT NULL DEFAULT 0,
     cfn_ativo         INTEGER NOT NULL DEFAULT 1 CHECK (cfn_ativo IN (0,1)),
@@ -42,18 +42,18 @@ CREATE TABLE Conta_Financeira (
 
 CREATE TABLE Categoria_Financeira (
     cat_codigo         INTEGER PRIMARY KEY AUTOINCREMENT,
-    cat_nome           TEXT NOT NULL,
+    cat_nome           TEXT COLLATE AUREA_CIAI NOT NULL,
     cat_tipo           TEXT NOT NULL CHECK (cat_tipo IN ('RECEITA','DESPESA')),
     cat_grupo_dre      TEXT NOT NULL CHECK (cat_grupo_dre IN
                          ('RECEITA_BRUTA','DEDUCOES','DESPESA_OPERACIONAL','OUTRAS_RECEITAS','OUTRAS_DESPESAS','NAO_DRE')),
-    cat_codigo_sistema TEXT,
+    cat_codigo_sistema TEXT COLLATE AUREA_CIAI,
     cat_ativo          INTEGER NOT NULL DEFAULT 1 CHECK (cat_ativo IN (0,1))
 );
 CREATE UNIQUE INDEX UX_Categoria_CodigoSistema ON Categoria_Financeira (cat_codigo_sistema) WHERE cat_codigo_sistema IS NOT NULL;
 
 CREATE TABLE Forma_Pagamento (
     fpg_codigo             INTEGER PRIMARY KEY AUTOINCREMENT,
-    fpg_nome               TEXT NOT NULL,
+    fpg_nome               TEXT COLLATE AUREA_CIAI NOT NULL,
     fpg_tpt_codigo         INTEGER NOT NULL REFERENCES Tipo_Titulo (tpt_codigo),
     fpg_permite_parcelas   INTEGER NOT NULL DEFAULT 0 CHECK (fpg_permite_parcelas IN (0,1)),
     fpg_max_parcelas       INTEGER NOT NULL DEFAULT 1,
@@ -62,15 +62,15 @@ CREATE TABLE Forma_Pagamento (
     fpg_intervalo_parcelas INTEGER NOT NULL DEFAULT 30,
     fpg_baixa_automatica   INTEGER NOT NULL DEFAULT 0 CHECK (fpg_baixa_automatica IN (0,1)),
     fpg_cfn_codigo         INTEGER REFERENCES Conta_Financeira (cfn_codigo),
-    fpg_nome_baixa         TEXT,
+    fpg_nome_baixa         TEXT COLLATE AUREA_CIAI,
     fpg_ativo              INTEGER NOT NULL DEFAULT 1 CHECK (fpg_ativo IN (0,1))
 );
 
 CREATE TABLE Pessoas (
     ups_codigo      INTEGER PRIMARY KEY AUTOINCREMENT,
-    ups_nome        TEXT NOT NULL,
-    ups_cpf         TEXT,
-    ups_telefone    TEXT,
+    ups_nome        TEXT COLLATE AUREA_CIAI NOT NULL,
+    ups_cpf         TEXT COLLATE AUREA_CIAI,
+    ups_telefone    TEXT COLLATE AUREA_CIAI,
     ups_cliente     INTEGER NOT NULL DEFAULT 0 CHECK (ups_cliente IN (0,1)),
     ups_fornecedor  INTEGER NOT NULL DEFAULT 0 CHECK (ups_fornecedor IN (0,1)),
     ups_vendedor    INTEGER NOT NULL DEFAULT 0 CHECK (ups_vendedor IN (0,1)),
@@ -91,7 +91,7 @@ CREATE INDEX IX_Pessoa_Segmento_Seg ON Pessoa_Segmento (ps_seg_codigo);
 
 CREATE TABLE Usuarios (
     usu_codigo       INTEGER PRIMARY KEY AUTOINCREMENT,
-    usu_nome         TEXT NOT NULL,
+    usu_nome         TEXT COLLATE AUREA_CIAI NOT NULL,
     usu_login        TEXT NOT NULL COLLATE AUREA_CIAI,
     usu_senha        TEXT NOT NULL,                              -- BCrypt ($2a$10$...)
     usu_ativo        INTEGER NOT NULL DEFAULT 1 CHECK (usu_ativo IN (0,1)),
@@ -115,7 +115,7 @@ CREATE TABLE Token_App (
     tok_codigo      INTEGER PRIMARY KEY AUTOINCREMENT,
     tok_usu_codigo  INTEGER NOT NULL REFERENCES Usuarios (usu_codigo) ON DELETE CASCADE,
     tok_hash        TEXT NOT NULL CHECK (length(tok_hash) = 64), -- SHA-256 em hexadecimal
-    tok_dispositivo TEXT,
+    tok_dispositivo TEXT COLLATE AUREA_CIAI,
     tok_criado_em   TEXT NOT NULL DEFAULT (datetime('now','localtime')),
     tok_expira_em   TEXT NOT NULL,
     tok_ultimo_uso  TEXT,
@@ -125,9 +125,9 @@ CREATE TABLE Token_App (
 
 CREATE TABLE Produto (
     upr_codigo        INTEGER PRIMARY KEY AUTOINCREMENT,
-    upr_nome          TEXT NOT NULL,
-    upr_complemento   TEXT,
-    upr_und           TEXT NOT NULL,
+    upr_nome          TEXT COLLATE AUREA_CIAI NOT NULL,
+    upr_complemento   TEXT COLLATE AUREA_CIAI,
+    upr_und           TEXT COLLATE AUREA_CIAI NOT NULL,
     upr_preco         INTEGER NOT NULL CHECK (upr_preco >= 0),   -- centavos (a regra "preço >= 0,01" é da aplicação)
     upr_ativo         INTEGER NOT NULL DEFAULT 1 CHECK (upr_ativo IN (0,1)),
     upr_criado_em     TEXT NOT NULL DEFAULT (datetime('now','localtime')),
@@ -165,7 +165,7 @@ CREATE TABLE Documento (
     docto_ups_codigo    INTEGER NOT NULL REFERENCES Pessoas (ups_codigo),
     docto_usu_codigo    INTEGER NOT NULL REFERENCES Usuarios (usu_codigo),
     docto_criado_em     TEXT NOT NULL DEFAULT (datetime('now','localtime')),
-    docto_classificacao TEXT,
+    docto_classificacao TEXT COLLATE AUREA_CIAI,
     docto_vendedor      INTEGER REFERENCES Pessoas (ups_codigo),
     docto_seg_codigo    INTEGER REFERENCES Segmento (seg_codigo)
 );
@@ -177,7 +177,7 @@ CREATE TABLE Itens_Documento (
     itemdocto_codigo        INTEGER PRIMARY KEY AUTOINCREMENT,
     itemdocto_docto_codigo  INTEGER NOT NULL REFERENCES Documento (docto_codigo),
     itemdocto_upr_codigo    INTEGER NOT NULL REFERENCES Produto (upr_codigo),
-    itemdocto_upr_und       TEXT NOT NULL,
+    itemdocto_upr_und       TEXT COLLATE AUREA_CIAI NOT NULL,
     itemdocto_qtd           INTEGER NOT NULL,                    -- milésimos
     itemdocto_valor         INTEGER NOT NULL,                    -- centavos
     itemdocto_total         INTEGER NOT NULL DEFAULT 0,          -- centavos
@@ -198,7 +198,7 @@ CREATE TABLE Titulo (
     tit_cat_codigo     INTEGER NOT NULL REFERENCES Categoria_Financeira (cat_codigo),
     tit_fpg_codigo     INTEGER REFERENCES Forma_Pagamento (fpg_codigo),
     tit_tpt_codigo     INTEGER REFERENCES Tipo_Titulo (tpt_codigo),
-    tit_descricao      TEXT NOT NULL,
+    tit_descricao      TEXT COLLATE AUREA_CIAI NOT NULL,
     tit_parcela        INTEGER NOT NULL DEFAULT 1,
     tit_total_parcelas INTEGER NOT NULL DEFAULT 1,
     tit_emissao        TEXT NOT NULL,
@@ -228,7 +228,7 @@ CREATE TABLE Baixa (
     bx_multa        INTEGER NOT NULL DEFAULT 0,
     bx_desconto     INTEGER NOT NULL DEFAULT 0,
     bx_taxa         INTEGER NOT NULL DEFAULT 0,
-    bx_observacao   TEXT,
+    bx_observacao   TEXT COLLATE AUREA_CIAI,
     bx_automatica   INTEGER NOT NULL DEFAULT 0 CHECK (bx_automatica IN (0,1)),
     bx_estornada    INTEGER NOT NULL DEFAULT 0 CHECK (bx_estornada IN (0,1)),
     bx_estornada_em TEXT,
@@ -244,7 +244,7 @@ CREATE TABLE Transferencia_Conta (
     trf_cfn_origem   INTEGER NOT NULL REFERENCES Conta_Financeira (cfn_codigo),
     trf_cfn_destino  INTEGER NOT NULL REFERENCES Conta_Financeira (cfn_codigo),
     trf_valor        INTEGER NOT NULL CHECK (trf_valor > 0),
-    trf_observacao   TEXT,
+    trf_observacao   TEXT COLLATE AUREA_CIAI,
     trf_usu_codigo   INTEGER,
     trf_estornada    INTEGER NOT NULL DEFAULT 0 CHECK (trf_estornada IN (0,1)),
     trf_estornada_em TEXT,
@@ -259,7 +259,7 @@ CREATE TABLE Movimento_Conta (
     mov_data          TEXT NOT NULL,
     mov_tipo          TEXT NOT NULL CHECK (mov_tipo IN ('ENTRADA','SAIDA')),
     mov_valor         INTEGER NOT NULL,
-    mov_descricao     TEXT NOT NULL,
+    mov_descricao     TEXT COLLATE AUREA_CIAI NOT NULL,
     mov_bx_codigo     INTEGER REFERENCES Baixa (bx_codigo),
     mov_conciliado    INTEGER NOT NULL DEFAULT 0 CHECK (mov_conciliado IN (0,1)),
     mov_conciliado_em TEXT,
@@ -283,14 +283,14 @@ CREATE UNIQUE INDEX UX_Meta_Venda_Mes_Loja     ON Meta_Venda (meta_mes) WHERE me
 CREATE TABLE Agendamento (
     agd_codigo           INTEGER PRIMARY KEY AUTOINCREMENT,
     agd_cliente          INTEGER REFERENCES Pessoas (ups_codigo),
-    agd_cliente_nome     TEXT,
-    agd_cliente_telefone TEXT,
+    agd_cliente_nome     TEXT COLLATE AUREA_CIAI,
+    agd_cliente_telefone TEXT COLLATE AUREA_CIAI,
     agd_prof_codigo      INTEGER NOT NULL REFERENCES Pessoas (ups_codigo),
     agd_inicio           TEXT NOT NULL,
     agd_fim              TEXT NOT NULL,
     agd_status           TEXT NOT NULL DEFAULT 'AGENDADO'
                          CHECK (agd_status IN ('AGENDADO','CONFIRMADO','EM_ATENDIMENTO','CONCLUIDO','FALTOU','CANCELADO')),
-    agd_obs              TEXT,
+    agd_obs              TEXT COLLATE AUREA_CIAI,
     agd_docto_codigo     INTEGER REFERENCES Documento (docto_codigo) ON DELETE SET NULL,
     agd_usu_codigo       INTEGER REFERENCES Usuarios (usu_codigo),
     agd_criado_em        TEXT NOT NULL DEFAULT (datetime('now','localtime')),
@@ -329,7 +329,7 @@ CREATE TABLE Agenda_Bloqueio (
     blq_prof_codigo INTEGER REFERENCES Pessoas (ups_codigo),     -- nulo = salão todo
     blq_inicio      TEXT NOT NULL,
     blq_fim         TEXT NOT NULL,
-    blq_motivo      TEXT,
+    blq_motivo      TEXT COLLATE AUREA_CIAI,
     CONSTRAINT CK_Agenda_Bloqueio_Periodo CHECK (blq_fim > blq_inicio)
 );
 CREATE INDEX IX_Agenda_Bloqueio_Inicio ON Agenda_Bloqueio (blq_inicio);

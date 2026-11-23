@@ -102,3 +102,10 @@ Os demais itens (D-05, D-06, D-07, D-09, D-10, D-11, D-13, D-14, D-16) seguem co
 
 ### D-19 · Dados de exemplo do `schema.sql` antigo
 O `schema.sql` do antigo cria **8 produtos, 8 pessoas, estoque e uma compra de exemplo**. O sistema novo **nasce sem nenhum dado de exemplo**. Para os testes comparados começarem do mesmo ponto, existe `tools/demo` (só desenvolvimento). **Pergunta para a migração (D-10):** o banco da VPS ainda tem esses exemplos ou eles já foram limpos? A ferramenta `cmd/migrar` copia o que estiver lá, então só preciso saber para conferir a contagem.
+
+### D-18 (continuação) · Mais duas diferenças deliberadas, em Produtos
+- **Número digitado que não é número** (só por requisição forjada): o antigo mostraria o texto técnico do Spring; o novo mostra "Valor inválido" ao lado do campo.
+- **Fator ou preço de unidade extra tão pequeno que arredonda para zero** (menor que 0,000001 ou 0,005): o antigo cairia num erro de banco; o novo diz "O fator de X é pequeno demais" ou "O preço de X deve ser maior que zero".
+
+### D-03 · Excluir produto — **implementado (b)** em 22/11/2026
+Com a opção que você escolheu (corrigir): produto **sem documento e sem saldo** é excluído junto com a linha de estoque zerada e as unidades extras; com documento ou saldo, nada é apagado e a mensagem continua a do antigo. O golden marca essa diferença como "decidida".

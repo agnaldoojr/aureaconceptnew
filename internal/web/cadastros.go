@@ -69,7 +69,18 @@ func (s *Servidor) flash(r *http.Request, tipo, mensagem string) {
 	}
 }
 
+// redirecionar manda o navegador para destino; as mensagens de uma só leitura gravadas por flash() ficam amarradas ao caminho
+// de destino (só aparecem lá), como o FlashMap do Spring.
 func (s *Servidor) redirecionar(w http.ResponseWriter, r *http.Request, destino string) {
+	if c := ctxDe(r); c != nil {
+		caminho := destino
+		if i := strings.IndexAny(caminho, "?#"); i >= 0 {
+			caminho = caminho[:i]
+		}
+		if err := s.sessoes.DestinarFlash(r.Context(), c.Sessao, caminho); err != nil {
+			s.log.Warn("encaminhar mensagem da sessão", "erro", err)
+		}
+	}
 	http.Redirect(w, r, destino, http.StatusFound)
 }
 

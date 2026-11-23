@@ -640,11 +640,11 @@ func TestSemPermissaoVoltaAoDashboardComMensagemDeUmaLeitura(t *testing.T) {
 
 func TestComPermissaoPassaDoPorteiro(t *testing.T) {
 	a := novoAmbiente(t, nil)
-	a.criarUsuario("ana", "Ana", "Ana-Senha-123", true, "PRODUTOS:C")
+	a.criarUsuario("ana", "Ana", "Ana-Senha-123", true, "ESTOQUE:C")
 	n := a.novoNavegador()
 	n.entrar("ana", "Ana-Senha-123")
 	// a tela de produtos ainda não existe (próxima fatia): passar pela permissão significa chegar ao 404, não ao redirecionamento
-	resp, _ := n.get("/produtos")
+	resp, _ := n.get("/estoque")
 	if resp.StatusCode != 404 {
 		t.Fatalf("esperado 404 (passou na permissão, tela ainda não migrada), veio %d → %s", resp.StatusCode, resp.Header.Get("Location"))
 	}
@@ -677,16 +677,16 @@ func TestPostSemCSRFEBloqueadoMesmoLogado(t *testing.T) {
 	a := novoAmbiente(t, nil)
 	n := a.novoNavegador()
 	n.entrar("admin", senhaAdmin)
-	resp, _ := n.fazer("POST", "/produtos/salvar", url.Values{"uprNome": {"x"}}, nil)
+	resp, _ := n.fazer("POST", "/estoque/ajustar", url.Values{"uprNome": {"x"}}, nil)
 	if resp.StatusCode != 403 {
 		t.Fatalf("POST sem token = %d, esperado 403", resp.StatusCode)
 	}
 	// o token também vale pelo cabeçalho X-CSRF-TOKEN (Modo vendedor); com ele o pedido chega à rota (404 por ora)
-	resp, _ = n.fazer("POST", "/produtos/salvar", url.Values{"uprNome": {"x"}}, map[string]string{"X-CSRF-TOKEN": n.csrfLogado()})
+	resp, _ = n.fazer("POST", "/estoque/ajustar", url.Values{"uprNome": {"x"}}, map[string]string{"X-CSRF-TOKEN": n.csrfLogado()})
 	if resp.StatusCode != 404 {
 		t.Fatalf("POST com cabeçalho X-CSRF-TOKEN = %d, esperado 404 (passou)", resp.StatusCode)
 	}
-	resp, _ = n.fazer("POST", "/produtos/salvar", url.Values{"uprNome": {"x"}}, map[string]string{"X-CSRF-TOKEN": "errado"})
+	resp, _ = n.fazer("POST", "/estoque/ajustar", url.Values{"uprNome": {"x"}}, map[string]string{"X-CSRF-TOKEN": "errado"})
 	if resp.StatusCode != 403 {
 		t.Fatalf("token errado = %d, esperado 403", resp.StatusCode)
 	}

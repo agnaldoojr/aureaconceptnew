@@ -153,34 +153,72 @@ func (s *Sessoes) Encerrar(ctx context.Context, id string) error {
 	return err
 }
 
-// Flash grava uma mensagem que aparece uma única vez na próxima tela (tipo: "erro", "sucesso" ou "info").
+// Flash grava uma mensagem de uma só leitura (tipo: "erro", "sucesso" ou "info") no item pendente da sessão (cria um se não
+// houver). Ela só ganha endereço de destino em DestinarFlash, quando a requisição redireciona. Como no antigo, cada redirect
+// gera um item próprio e eles formam uma fila.
 func (s *Sessoes) Flash(ctx context.Context, sess *Sessao, tipo, mensagem string) error {
 	col, err := colunaFlash(tipo)
 	if err != nil {
 		return err
 	}
-	_, err = s.b.W.ExecContext(ctx, `UPDATE Sessao_Web SET `+col+` = ? WHERE ses_hash = ?`, mensagem, sess.hash)
+	tx, err := s.b.W.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	var id int64
+	err = tx.QueryRowContext(ctx, `SELECT flash_codigo FROM Flash_Web WHERE flash_ses_hash = ? AND flash_destino IS NULL ORDER BY flash_codigo LIMIT 1`, sess.hash).Scan(&id)
+	if errors.Is(err, sql.ErrNoRows) {
+		res, err := tx.ExecContext(ctx, `INSERT INTO Flash_Web (flash_ses_hash) SELECT ses_hash FROM Sessao_Web WHERE ses_hash = ?`, sess.hash)
+		if err != nil {
+			return err
+		}
+		if id, err = res.LastInsertId(); err != nil || id == 0 {
+			return err // sessão que já não existe: nada a gravar
+		}
+	} else if err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `UPDATE Flash_Web SET `+col+` = ? WHERE flash_codigo = ?`, mensagem, id); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// duracaoFlash é quanto tempo a mensagem espera pela tela de destino (o FlashMap do Spring vale 180 s).
+const duracaoFlash = 180 * time.Second
+
+// DestinarFlash diz em que endereço (só o caminho, sem a consulta) o item pendente deve aparecer: o do redirect.
+func (s *Sessoes) DestinarFlash(ctx context.Context, sess *Sessao, destino string) error {
+	_, err := s.b.W.ExecContext(ctx, `UPDATE Flash_Web SET flash_destino = ?, flash_expira = ? WHERE flash_ses_hash = ? AND flash_destino IS NULL`,
+		destino, s.agora().Add(duracaoFlash).Unix(), sess.hash)
 	return err
 }
 
-// LerFlash devolve e apaga as mensagens de uma só leitura da sessão.
-func (s *Sessoes) LerFlash(ctx context.Context, sess *Sessao) (erro, sucesso, info string, err error) {
-	var e, su, in sql.NullString
+// LerFlash consome o item MAIS ANTIGO destinado a este caminho (os vencidos são descartados). Visitar outra tela antes não
+// consome nem mostra nada, e duas mensagens para a mesma tela saem uma por visita, como no Spring.
+func (s *Sessoes) LerFlash(ctx context.Context, sess *Sessao, caminho string) (erro, sucesso, info string, err error) {
 	tx, err := s.b.W.BeginTx(ctx, nil)
 	if err != nil {
 		return "", "", "", err
 	}
 	defer tx.Rollback()
-	if err := tx.QueryRowContext(ctx, `SELECT ses_flash_erro, ses_flash_sucesso, ses_flash_info FROM Sessao_Web WHERE ses_hash = ?`, sess.hash).Scan(&e, &su, &in); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return "", "", "", nil
-		}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM Flash_Web WHERE flash_ses_hash = ? AND flash_expira IS NOT NULL AND flash_expira < ?`, sess.hash, s.agora().Unix()); err != nil {
 		return "", "", "", err
 	}
-	if e.Valid || su.Valid || in.Valid {
-		if _, err := tx.ExecContext(ctx, `UPDATE Sessao_Web SET ses_flash_erro = NULL, ses_flash_sucesso = NULL, ses_flash_info = NULL WHERE ses_hash = ?`, sess.hash); err != nil {
-			return "", "", "", err
-		}
+	var id int64
+	var e, su, in sql.NullString
+	err = tx.QueryRowContext(ctx, `SELECT flash_codigo, flash_erro, flash_sucesso, flash_info FROM Flash_Web WHERE flash_ses_hash = ? AND flash_destino = ? ORDER BY flash_codigo LIMIT 1`, sess.hash, caminho).Scan(&id, &e, &su, &in)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", "", "", tx.Commit()
+	}
+	if err != nil {
+		return "", "", "", err
+	}
+	// consumir um item remove TODOS os iguais (mesmo destino e mesmas mensagens): o FlashMap do Spring compara por conteúdo e o
+	// antigo apaga com removeAll. Mensagens diferentes continuam na fila, uma por visita.
+	if _, err := tx.ExecContext(ctx, `DELETE FROM Flash_Web WHERE flash_ses_hash = ? AND flash_destino = ? AND flash_erro IS ? AND flash_sucesso IS ? AND flash_info IS ?`, sess.hash, caminho, e, su, in); err != nil {
+		return "", "", "", err
 	}
 	return e.String, su.String, in.String, tx.Commit()
 }
@@ -188,11 +226,11 @@ func (s *Sessoes) LerFlash(ctx context.Context, sess *Sessao) (erro, sucesso, in
 func colunaFlash(tipo string) (string, error) {
 	switch tipo {
 	case "erro":
-		return "ses_flash_erro", nil
+		return "flash_erro", nil
 	case "sucesso":
-		return "ses_flash_sucesso", nil
+		return "flash_sucesso", nil
 	case "info":
-		return "ses_flash_info", nil
+		return "flash_info", nil
 	}
 	return "", errors.New("tipo de mensagem desconhecido: " + tipo)
 }

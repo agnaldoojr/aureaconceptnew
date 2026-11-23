@@ -1,0 +1,78 @@
+{{define "conteudo"}}
+<div class="page-header">
+    <h1 class="page-title"><span class="page-title-icon">◆</span> Produtos</h1>
+    {{if pode .Auth "PRODUTOS_INCLUSAO"}}<a href="/produtos/novo" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Novo Produto
+    </a>{{end}}
+</div>
+
+<!-- Filtro de busca -->
+<form action="/produtos" method="get" class="search-bar">
+    <div class="search-input-group">
+        <i class="fas fa-search"></i>
+        <input type="text" name="busca" value="{{.Dados.Busca}}"
+               class="form-control" placeholder="Buscar por nome ou código..."/>
+    </div>
+    <select name="tipo" class="form-control" style="width:auto" onchange="this.form.submit()" title="Produtos ou serviços">
+        <option value="">Produtos e serviços</option>
+        <option value="produto"{{if eq .Dados.Tipo "produto"}} selected="selected"{{end}}>Só produtos</option>
+        <option value="servico"{{if eq .Dados.Tipo "servico"}} selected="selected"{{end}}>Só serviços</option>
+    </select>
+    <button type="submit" class="btn btn-outline">Buscar</button>
+    <a href="/produtos" class="btn btn-ghost">Limpar</a>
+</form>
+
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nome</th>
+                <th>Complemento</th>
+                <th>Und.</th>
+                <th>Preço</th>
+                <th>Status</th>
+                <th class="col-actions">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Dados.Produtos}}<tr{{if not .Ativo}} class="row-inactive"{{end}}>
+                <td>{{.Codigo}}</td>
+                <td class="fw-500">
+                    <span>{{.Nome}}</span>
+                    {{if .Selo}}<span class="badge badge-blue" style="margin-left:.4rem">{{.Selo}}</span>{{end}}
+                </td>
+                <td class="text-muted">{{.Complemento}}</td>
+                <td>{{.Und}}</td>
+                <td>{{.Preco}}</td>
+                <td>
+                    <span class="badge {{if .Ativo}}badge-green{{else}}badge-gray{{end}}">{{if .Ativo}}Ativo{{else}}Inativo{{end}}</span>
+                </td>
+                <td class="actions-cell">
+                    {{if pode $.Auth "PRODUTOS_ATUALIZACAO"}}<a href="/produtos/editar/{{.Codigo}}" class="btn btn-sm btn-edit" title="Editar">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                    <form action="/produtos/status/{{.Codigo}}" method="post" style="display:inline">
+                        <input type="hidden" name="_csrf" value="{{$.CSRF}}"/>
+                        <input type="hidden" name="_method" value="post"/>
+                        <input type="hidden" name="ativo" value="{{if .Ativo}}false{{else}}true{{end}}"/>
+                        <button type="submit" class="btn btn-sm {{if .Ativo}}btn-warning{{else}}btn-success{{end}}"
+                                title="{{if .Ativo}}Inativar{{else}}Ativar{{end}}">
+                            <i class="fas {{if .Ativo}}fa-ban{{else}}fa-check{{end}}"></i>
+                        </button>
+                    </form>{{end}}
+                    {{if pode $.Auth "PRODUTOS_EXCLUSAO"}}<form action="/produtos/excluir/{{.Codigo}}" method="post" style="display:inline"
+                          onsubmit="return confirm('Confirma a exclusão deste produto?')">
+                        <input type="hidden" name="_csrf" value="{{$.CSRF}}"/>
+                        <button type="submit" class="btn btn-sm btn-delete" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>{{end}}
+                </td>
+            </tr>{{else}}<tr>
+                <td colspan="7" class="text-center text-muted">Nenhum produto encontrado.</td>
+            </tr>{{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}

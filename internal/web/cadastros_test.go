@@ -8,9 +8,19 @@ import (
 	"github.com/agnaldoojr/aureaconceptnew/internal/cadastro"
 )
 
+// drenar esvazia a fila de mensagens de uma só leitura (no sistema real cada visita à tela de destino
+// consome uma, como no antigo); os testes chamam antes de uma ação cuja mensagem querem conferir.
+func (n *navegador) drenar() {
+	n.a.t.Helper()
+	if _, err := n.a.banco.W.Exec(`DELETE FROM Flash_Web`); err != nil {
+		n.a.t.Fatal(err)
+	}
+}
+
 // postar envia um formulário com o token CSRF da sessão e devolve a resposta.
 func (n *navegador) postar(caminho string, v url.Values) (status int, local string) {
 	n.a.t.Helper()
+	n.drenar()
 	if v == nil {
 		v = url.Values{}
 	}
